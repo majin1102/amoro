@@ -100,6 +100,15 @@ public class TablePropertyUtil {
   }
 
   public static Map<String, String> getPartitionProperties(
+      ArcticTable arcticTable, StructLike partition) {
+    return getPartitionProperties(
+        arcticTable.isKeyedTable()
+            ? arcticTable.asKeyedTable().baseTable()
+            : arcticTable.asUnkeyedTable(),
+        partition);
+  }
+
+  public static Map<String, String> getPartitionProperties(
       ArcticTable arcticTable, String partitionPath) {
     return getPartitionProperties(
         arcticTable.isKeyedTable()

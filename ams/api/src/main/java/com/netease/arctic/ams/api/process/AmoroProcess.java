@@ -22,6 +22,7 @@ package com.netease.arctic.ams.api.process;
 
 import com.netease.arctic.ams.api.Action;
 
+// TODO wangtaohz add docs for class
 public interface AmoroProcess<T extends ProcessState> {
 
   void submit();

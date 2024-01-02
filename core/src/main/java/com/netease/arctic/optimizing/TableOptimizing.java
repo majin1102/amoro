@@ -18,26 +18,22 @@
 
 package com.netease.arctic.optimizing;
 
-import java.io.Serializable;
-import java.util.Map;
+import com.netease.arctic.process.TaskExecutor;
 
+// TODO wangtaohz change docs
 /**
  * The TableOptimizing interface defines the plan, execute, commit, and other processes required
  * during the optimizing process, as well as the input and output. Currently, these processes are
  * still scattered throughout various parts of AMS, so this interface has not yet been formally
  * used.
  */
-public interface TableOptimizing<
-    I extends TableOptimizing.OptimizingInput, O extends TableOptimizing.OptimizingOutput> {
+public interface TableOptimizing {
 
-  /** The input will be execute by {@link OptimizingExecutor}. */
-  I[] planInputs();
+  RewriteFilesExecutorFactory createRewriteFilesExecutorFactory();
 
-  /** Create an {@link OptimizingExecutorFactory}. */
-  OptimizingExecutorFactory<I> createExecutorFactory();
+  TablePlanExecutorFactory createTablePlanExecutorFactory();
 
-  /** Create an {@link OptimizingCommitterFactory}. */
-  OptimizingCommitterFactory<O> createCommitterFactory();
+  TableCommitExecutorFactory createTableCommitExecutorFactory();
 
   /**
    * An interface represent all input of optimizing that will be executed by {@link
@@ -45,20 +41,17 @@ public interface TableOptimizing<
    * control the behavior of {@link OptimizingExecutor}. such as whether to enable RocksDB, whether
    * to move files to Hive, and other parameters.
    */
-  interface OptimizingInput extends Serializable {
-
-    /** Set propertity for this OptimizingInput. */
-    void option(String name, String value);
-
-    /** Set properties for this OptimizingInput. */
-    void options(Map<String, String> options);
-
-    /** Get properties. */
-    Map<String, String> getOptions();
-  }
+  interface OptimizingInput extends TaskExecutor.Input {}
 
   /** Produced by {@link OptimizingExecutor} represent compaction result. */
-  interface OptimizingOutput extends Serializable {
-    Map<String, String> summary();
-  }
+  interface OptimizingOutput extends TaskExecutor.Output {}
+
+  interface RewriteFilesExecutorFactory
+      extends OptimizingExecutorFactory<RewriteFilesInput, RewriteFilesOutput> {}
+
+  interface TablePlanExecutorFactory
+      extends OptimizingExecutorFactory<TablePlanInput, TablePlanOutput> {}
+
+  interface TableCommitExecutorFactory
+      extends OptimizingExecutorFactory<TableCommitInput, TableCommitOutput> {}
 }

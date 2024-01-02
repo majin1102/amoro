@@ -84,11 +84,13 @@ public class DefaultTableRuntime extends StatedPersistentBase implements TableRu
     this.blockerRuntime = new TableBlockerRuntime(tableIdentifier);
   }
 
+  // TODO wangtaohz: new added table not call this method
   public void register(
       ProcessFactory<DefaultOptimizingState> defaultOptimizingFactory, boolean recover) {
     optimizingRunner = new OptimizingRunner(this, defaultOptimizingFactory, recover);
   }
 
+  // TODO wangtaohz: new added table not call this method
   public void register(
       Set<Action> actions, ProcessFactory<TableState> processFactory, boolean recover) {
     actions.forEach(

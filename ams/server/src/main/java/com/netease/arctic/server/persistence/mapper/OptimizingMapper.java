@@ -12,7 +12,6 @@ import com.netease.arctic.server.persistence.converter.MapLong2StringConverter;
 import com.netease.arctic.server.persistence.converter.Object2ByteArrayConvert;
 import com.netease.arctic.server.process.DefaultOptimizingState;
 import com.netease.arctic.server.process.OptimizingSummary;
-import com.netease.arctic.server.process.OptimizingType;
 import com.netease.arctic.server.process.TaskRuntime;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;

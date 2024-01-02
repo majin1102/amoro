@@ -24,6 +24,7 @@ import com.netease.arctic.catalog.CatalogTestHelper;
 import com.netease.arctic.catalog.TableTestBase;
 import com.netease.arctic.data.DataFileType;
 import com.netease.arctic.data.PrimaryKeyedFile;
+import com.netease.arctic.optimizing.scan.FileScanResult;
 import com.netease.arctic.server.optimizerlegacy.TableFileScanHelper;
 import com.netease.arctic.utils.ContentFiles;
 import org.apache.iceberg.ContentFile;
@@ -42,24 +43,22 @@ public abstract class TableFileScanHelperTestBase extends TableTestBase {
     super(catalogTestHelper, tableTestHelper);
   }
 
-  protected void assertScanResult(
-      List<TableFileScanHelper.FileScanResult> result, int size, Integer deleteCnt) {
+  protected void assertScanResult(List<FileScanResult> result, int size, Integer deleteCnt) {
     assertScanResult(result, size, null, deleteCnt);
   }
 
-  protected void assertScanResult(
-      List<TableFileScanHelper.FileScanResult> result, int size, Long sequence) {
+  protected void assertScanResult(List<FileScanResult> result, int size, Long sequence) {
     assertScanResult(result, size, sequence, null);
   }
 
-  protected void assertScanResult(List<TableFileScanHelper.FileScanResult> result, int size) {
+  protected void assertScanResult(List<FileScanResult> result, int size) {
     assertScanResult(result, size, null, null);
   }
 
   protected void assertScanResult(
-      List<TableFileScanHelper.FileScanResult> result, int size, Long sequence, Integer deleteCnt) {
+      List<FileScanResult> result, int size, Long sequence, Integer deleteCnt) {
     Assert.assertEquals(size, result.size());
-    for (TableFileScanHelper.FileScanResult fileScanResult : result) {
+    for (FileScanResult fileScanResult : result) {
       DataFile file = fileScanResult.file();
       assertDataFileClass(file);
       if (sequence != null) {
@@ -90,12 +89,12 @@ public abstract class TableFileScanHelperTestBase extends TableTestBase {
 
   protected abstract TableFileScanHelper buildFileScanHelper();
 
-  protected List<TableFileScanHelper.FileScanResult> scanFiles() {
+  protected List<FileScanResult> scanFiles() {
     return scanFiles(buildFileScanHelper());
   }
 
-  protected List<TableFileScanHelper.FileScanResult> scanFiles(TableFileScanHelper scanHelper) {
-    try (CloseableIterable<TableFileScanHelper.FileScanResult> results = scanHelper.scan()) {
+  protected List<FileScanResult> scanFiles(TableFileScanHelper scanHelper) {
+    try (CloseableIterable<FileScanResult> results = scanHelper.scan()) {
       return Lists.newArrayList(results.iterator());
     } catch (IOException e) {
       throw new UncheckedIOException(e);

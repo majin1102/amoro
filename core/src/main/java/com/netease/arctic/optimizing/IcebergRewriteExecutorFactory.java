@@ -22,7 +22,7 @@ import org.apache.iceberg.relocated.com.google.common.collect.Maps;
 
 import java.util.Map;
 
-public class IcebergRewriteExecutorFactory implements OptimizingExecutorFactory<RewriteFilesInput> {
+public class IcebergRewriteExecutorFactory implements TableOptimizing.RewriteFilesExecutorFactory {
 
   private Map<String, String> properties;
 
@@ -32,7 +32,7 @@ public class IcebergRewriteExecutorFactory implements OptimizingExecutorFactory<
   }
 
   @Override
-  public OptimizingExecutor createExecutor(RewriteFilesInput input) {
+  public OptimizingExecutor<RewriteFilesOutput> createExecutor(RewriteFilesInput input) {
     OptimizingInputProperties optimizingConfig = OptimizingInputProperties.parse(properties);
     return new IcebergRewriteExecutor(
         input, input.getTable(), optimizingConfig.getStructLikeCollections());

@@ -24,9 +24,10 @@ import com.netease.arctic.ams.api.TableFormat;
 import com.netease.arctic.catalog.BasicCatalogTestHelper;
 import com.netease.arctic.catalog.CatalogTestHelper;
 import com.netease.arctic.io.MixedDataTestHelpers;
-import com.netease.arctic.server.optimizing.OptimizingTestHelpers;
+import com.netease.arctic.optimizing.scan.FileScanResult;
 import com.netease.arctic.server.optimizerlegacy.TableFileScanHelper;
 import com.netease.arctic.server.optimizerlegacy.UnkeyedTableFileScanHelper;
+import com.netease.arctic.server.optimizing.OptimizingTestHelpers;
 import com.netease.arctic.server.utils.IcebergTableUtil;
 import com.netease.arctic.table.UnkeyedTable;
 import org.apache.iceberg.DataFile;
@@ -63,7 +64,7 @@ public class TestUnkeyedTableFileScanHelper extends TableFileScanHelperTestBase 
 
   @Test
   public void testScanEmpty() {
-    List<TableFileScanHelper.FileScanResult> scan = scanFiles();
+    List<FileScanResult> scan = scanFiles();
     assertScanResult(scan, 0);
   }
 
@@ -73,7 +74,7 @@ public class TestUnkeyedTableFileScanHelper extends TableFileScanHelperTestBase 
         getArcticTable(),
         tableTestHelper().writeBaseStore(getArcticTable(), 0L, Collections.emptyList(), false));
 
-    List<TableFileScanHelper.FileScanResult> scan = scanFiles();
+    List<FileScanResult> scan = scanFiles();
     assertScanResult(scan, 0);
   }
 
@@ -92,7 +93,7 @@ public class TestUnkeyedTableFileScanHelper extends TableFileScanHelperTestBase 
         getArcticTable(),
         tableTestHelper().writeBaseStore(getArcticTable(), 0L, newRecords, false));
 
-    List<TableFileScanHelper.FileScanResult> scan = scanFiles();
+    List<FileScanResult> scan = scanFiles();
 
     if (isPartitionedTable()) {
       assertScanResult(scan, 4, null, 0);
@@ -128,7 +129,7 @@ public class TestUnkeyedTableFileScanHelper extends TableFileScanHelperTestBase 
     }
     OptimizingTestHelpers.appendBasePosDelete(getArcticTable(), posDeleteFiles);
 
-    List<TableFileScanHelper.FileScanResult> scan = scanFiles();
+    List<FileScanResult> scan = scanFiles();
 
     assertScanResult(scan, 1, null, 1);
   }

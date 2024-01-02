@@ -20,7 +20,7 @@ package com.netease.arctic.server.persistence;
 
 import com.netease.arctic.ams.api.process.OptimizingStage;
 import com.netease.arctic.ams.api.process.ProcessStatus;
-import com.netease.arctic.server.process.OptimizingType;
+import com.netease.arctic.optimizing.OptimizingType;
 
 /** Meta of optimizing process. */
 public class OptimizingStatePersistency {

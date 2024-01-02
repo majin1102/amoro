@@ -53,6 +53,7 @@ public abstract class TaskScheduler<T extends TableState>
     try {
       TaskRuntime<?, ?> task = fetchTask();
       if (task == null) {
+        // TODO wangtaohz only pending table can be scheduled
         Optional.ofNullable(scheduleTable())
             .ifPresent(scheduled -> run(scheduled.getLeft(), scheduled.getRight()));
         task = fetchTask();
@@ -65,6 +66,7 @@ public abstract class TaskScheduler<T extends TableState>
 
   private void run(DefaultTableRuntime tableRuntime, Action action) {
     if (action == Action.MINOR_OPTIMIZING) {
+      // TODO wangtaohz add process to tableProcessQueue?
       printProcessIfNecessary(
           tableRuntime.runMinorOptimizing(), false, tableRuntime.getTableIdentifier());
     } else {
@@ -141,6 +143,7 @@ public abstract class TaskScheduler<T extends TableState>
             refreshTable(defaultTableRuntime);
           });
       process.submit();
+      // TODO wangtaohz why add process to tableProcessQueue here?
       tableProcessQueue.offer(process);
       return process;
     } else {

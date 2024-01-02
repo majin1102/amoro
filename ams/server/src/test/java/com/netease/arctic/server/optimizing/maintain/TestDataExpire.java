@@ -25,19 +25,20 @@ import com.google.common.collect.Lists;
 import com.netease.arctic.BasicTableTestHelper;
 import com.netease.arctic.TableTestHelper;
 import com.netease.arctic.ams.api.TableFormat;
+import com.netease.arctic.ams.api.config.DataExpirationConfig;
 import com.netease.arctic.catalog.BasicCatalogTestHelper;
 import com.netease.arctic.catalog.CatalogTestHelper;
 import com.netease.arctic.data.ChangeAction;
 import com.netease.arctic.data.DataFileType;
 import com.netease.arctic.data.PrimaryKeyedFile;
 import com.netease.arctic.io.MixedDataTestHelpers;
-import com.netease.arctic.server.optimizing.OptimizingTestHelpers;
+import com.netease.arctic.optimizing.scan.FileScanResult;
 import com.netease.arctic.server.optimizerlegacy.KeyedTableFileScanHelper;
 import com.netease.arctic.server.optimizerlegacy.TableFileScanHelper;
 import com.netease.arctic.server.optimizerlegacy.UnkeyedTableFileScanHelper;
+import com.netease.arctic.server.optimizing.OptimizingTestHelpers;
 import com.netease.arctic.server.process.maintain.IcebergTableMaintainer;
 import com.netease.arctic.server.process.maintain.MixedTableMaintainer;
-import com.netease.arctic.ams.api.config.DataExpirationConfig;
 import com.netease.arctic.server.table.KeyedTableSnapshot;
 import com.netease.arctic.server.table.executor.ExecutorTestBase;
 import com.netease.arctic.server.utils.IcebergTableUtil;
@@ -233,7 +234,7 @@ public class TestDataExpire extends ExecutorTestBase {
         keyedTable,
         tableTestHelper().writeChangeStore(keyedTable, 1L, ChangeAction.INSERT, newRecords, false));
 
-    CloseableIterable<TableFileScanHelper.FileScanResult> scan = buildKeyedFileScanHelper().scan();
+    CloseableIterable<FileScanResult> scan = buildKeyedFileScanHelper().scan();
     assertScanResult(scan, 4, 0);
 
     // expire partitions that order than 2022-01-02 18:00:00.000
@@ -247,8 +248,7 @@ public class TestDataExpire extends ExecutorTestBase {
                     keyedTable.schema().findField(config.getExpirationField())))
             .toInstant());
 
-    CloseableIterable<TableFileScanHelper.FileScanResult> scanAfterExpire =
-        buildKeyedFileScanHelper().scan();
+    CloseableIterable<FileScanResult> scanAfterExpire = buildKeyedFileScanHelper().scan();
     if (tableTestHelper().partitionSpec().isPartitioned()) {
       if (expireByStringDate()) {
         assertScanResult(scanAfterExpire, 1, 0);
@@ -316,7 +316,7 @@ public class TestDataExpire extends ExecutorTestBase {
         keyedTable,
         tableTestHelper().writeChangeStore(keyedTable, 1L, ChangeAction.INSERT, newRecords, false));
 
-    CloseableIterable<TableFileScanHelper.FileScanResult> scan = buildKeyedFileScanHelper().scan();
+    CloseableIterable<FileScanResult> scan = buildKeyedFileScanHelper().scan();
     assertScanResult(scan, 4, 0);
 
     // expire partitions that order than 2022-01-02 18:00:00.000
@@ -330,8 +330,7 @@ public class TestDataExpire extends ExecutorTestBase {
                     keyedTable.schema().findField(config.getExpirationField())))
             .toInstant());
 
-    CloseableIterable<TableFileScanHelper.FileScanResult> scanAfterExpire =
-        buildKeyedFileScanHelper().scan();
+    CloseableIterable<FileScanResult> scanAfterExpire = buildKeyedFileScanHelper().scan();
     assertScanResult(scanAfterExpire, 1, 0);
 
     List<Record> records = readSortedKeyedRecords(keyedTable);
@@ -354,7 +353,7 @@ public class TestDataExpire extends ExecutorTestBase {
                 getArcticTable(),
                 tableTestHelper()
                     .writeBaseStore(getArcticTable(), 0, Lists.newArrayList(r), false)));
-    CloseableIterable<TableFileScanHelper.FileScanResult> scan = getTableFileScanHelper().scan();
+    CloseableIterable<FileScanResult> scan = getTableFileScanHelper().scan();
     assertScanResult(scan, 4, 0);
 
     // expire partitions that order than 2022-01-02 18:00:00.000
@@ -451,9 +450,9 @@ public class TestDataExpire extends ExecutorTestBase {
   }
 
   protected void assertScanResult(
-      CloseableIterable<TableFileScanHelper.FileScanResult> result, int size, Integer deleteCnt) {
+      CloseableIterable<FileScanResult> result, int size, Integer deleteCnt) {
     int scanCnt = 0;
-    for (TableFileScanHelper.FileScanResult fileScanResult : result) {
+    for (FileScanResult fileScanResult : result) {
       ++scanCnt;
       if (deleteCnt != null) {
         Assert.assertEquals(deleteCnt.intValue(), fileScanResult.deleteFiles().size());

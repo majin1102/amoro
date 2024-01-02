@@ -22,8 +22,13 @@ package com.netease.arctic.server.process;
 
 import com.netease.arctic.ams.api.OptimizingTaskId;
 import com.netease.arctic.ams.api.process.OptimizingStage;
+import com.netease.arctic.optimizing.OptimizingType;
 import com.netease.arctic.optimizing.RewriteFilesInput;
 import com.netease.arctic.optimizing.RewriteFilesOutput;
+import com.netease.arctic.optimizing.TableCommitInput;
+import com.netease.arctic.optimizing.TableCommitOutput;
+import com.netease.arctic.optimizing.TablePlanInput;
+import com.netease.arctic.optimizing.TablePlanOutput;
 import com.netease.arctic.server.persistence.PersistentBase;
 import com.netease.arctic.server.persistence.TaskFilesPersistence;
 import com.netease.arctic.server.persistence.mapper.OptimizingMapper;
@@ -45,9 +50,11 @@ import java.util.concurrent.locks.ReentrantLock;
 
 public class DefaultOptimizingProcess extends ManagedProcess<DefaultOptimizingState> {
 
+  // TODO wangtaohz COMMIT_TASK_SEQUENCE
   private static final int COMMMIT_TASK_SEQUENCE = Integer.MAX_VALUE;
 
   private final long processId;
+  // TODO wangtaohz executing tasks
   private final Map<OptimizingTaskId, TaskRuntime<?, ?>> executingMap = Maps.newHashMap();
   private final LinkedList<TaskRuntime<?, ?>> taskQueue = new LinkedList<>();
   private final QuotaProvider optimizingQuota;
@@ -199,7 +206,7 @@ public class DefaultOptimizingProcess extends ManagedProcess<DefaultOptimizingSt
           if (taskRuntime.getTaskId().getTaskId() == COMMMIT_TASK_SEQUENCE) {
             TaskRuntime<TableCommitInput, TableCommitOutput> committingTask =
                 (TaskRuntime<TableCommitInput, TableCommitOutput>) taskRuntime;
-            // TODO
+            // TODO wangtaohz fix loading from sysdb
             committingTask.setInput(new TableCommitInput());
             submitAsyncTask(committingTask, () -> handleCommittingCompleted(committingTask));
           } else {

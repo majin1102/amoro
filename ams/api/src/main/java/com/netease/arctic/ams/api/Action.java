@@ -26,6 +26,7 @@ import java.util.Collections;
 import java.util.Set;
 
 public enum Action {
+  // TODO wangtaohz data expiring
   MINOR_OPTIMIZING("minor-optimizing", 0),
   MAJOR_OPTIMIZING("minor-optimizing", 1),
   EXTERNAL_OPTIMIZING("external-optimizing", 2),

@@ -23,16 +23,15 @@ import org.apache.iceberg.DeleteFile;
 
 import java.util.Map;
 
-public class RewriteFilesOutput implements TableOptimizing.OptimizingOutput {
+public class RewriteFilesOutput extends BaseOptimizingOutput {
   private final DataFile[] dataFiles;
   private final DeleteFile[] deleteFiles;
-  private final Map<String, String> summary;
 
   public RewriteFilesOutput(
       DataFile[] dataFiles, DeleteFile[] deleteFiles, Map<String, String> summary) {
+    super(summary);
     this.dataFiles = dataFiles;
     this.deleteFiles = deleteFiles;
-    this.summary = summary;
   }
 
   public DataFile[] getDataFiles() {
@@ -41,22 +40,5 @@ public class RewriteFilesOutput implements TableOptimizing.OptimizingOutput {
 
   public DeleteFile[] getDeleteFiles() {
     return deleteFiles;
-  }
-
-  @Override
-  public Map<String, String> summary() {
-    return summary;
-  }
-
-  @Override
-  public String toString() {
-    return "RewriteFilesOutput{"
-        + "dataFilesSize="
-        + (dataFiles == null ? 0 : dataFiles.length)
-        + ", deleteFilesSize="
-        + (deleteFiles == null ? 0 : deleteFiles.length)
-        + ", summary="
-        + summary
-        + '}';
   }
 }

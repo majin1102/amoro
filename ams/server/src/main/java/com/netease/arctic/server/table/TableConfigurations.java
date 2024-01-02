@@ -16,7 +16,6 @@ import java.util.Map;
 
 public class TableConfigurations {
 
-
   private static TagConfiguration parseTagConfiguration(Map<String, String> tableProperties) {
     TagConfiguration tagConfig = new TagConfiguration();
     tagConfig.setAutoCreateTag(
@@ -164,6 +163,11 @@ public class TableConfigurations {
                 properties,
                 TableProperties.SELF_OPTIMIZING_FRAGMENT_RATIO,
                 TableProperties.SELF_OPTIMIZING_FRAGMENT_RATIO_DEFAULT))
+        .setMinTargetSizeRatio(
+            CompatiblePropertyUtil.propertyAsDouble(
+                properties,
+                TableProperties.SELF_OPTIMIZING_MIN_TARGET_SIZE_RATIO,
+                TableProperties.SELF_OPTIMIZING_MIN_TARGET_SIZE_RATIO_DEFAULT))
         .setMaxFileCount(
             CompatiblePropertyUtil.propertyAsInt(
                 properties,

@@ -1,8 +1,8 @@
 package com.netease.arctic.ams.api.config;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
-import org.apache.iceberg.relocated.com.google.common.base.MoreObjects;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class OptimizingConfig {
@@ -36,6 +36,9 @@ public class OptimizingConfig {
 
   // self-optimizing.fragment-ratio
   private int fragmentRatio;
+
+  // self-optimizing.min-target-size-ratio
+  private double minTargetSizeRatio;
 
   // self-optimizing.minor.trigger.file-count
   private int minorLeastFileCount;
@@ -151,8 +154,17 @@ public class OptimizingConfig {
     return fragmentRatio;
   }
 
+  public double getMinTargetSizeRatio() {
+    return minTargetSizeRatio;
+  }
+
   public long maxFragmentSize() {
     return targetSize / fragmentRatio;
+  }
+
+  public OptimizingConfig setMinTargetSizeRatio(double minTargetSizeRatio) {
+    this.minTargetSizeRatio = minTargetSizeRatio;
+    return this;
   }
 
   public long maxDuplicateSize() {
@@ -250,6 +262,7 @@ public class OptimizingConfig {
         && maxFileCount == that.maxFileCount
         && openFileCost == that.openFileCost
         && fragmentRatio == that.fragmentRatio
+        && Double.compare(that.minTargetSizeRatio, minTargetSizeRatio) == 0
         && minorLeastFileCount == that.minorLeastFileCount
         && minorLeastInterval == that.minorLeastInterval
         && Double.compare(that.majorDuplicateRatio, majorDuplicateRatio) == 0
@@ -258,6 +271,7 @@ public class OptimizingConfig {
         && baseHashBucket == that.baseHashBucket
         && baseRefreshInterval == that.baseRefreshInterval
         && hiveRefreshInterval == that.hiveRefreshInterval
+        && minPlanInterval == that.minPlanInterval
         && Objects.equal(optimizerGroup, that.optimizerGroup);
   }
 
@@ -274,6 +288,7 @@ public class OptimizingConfig {
         maxFileCount,
         openFileCost,
         fragmentRatio,
+        minTargetSizeRatio,
         minorLeastFileCount,
         minorLeastInterval,
         majorDuplicateRatio,
@@ -281,7 +296,8 @@ public class OptimizingConfig {
         fullRewriteAllFiles,
         baseHashBucket,
         baseRefreshInterval,
-        hiveRefreshInterval);
+        hiveRefreshInterval,
+        minPlanInterval);
   }
 
   @Override
@@ -297,6 +313,7 @@ public class OptimizingConfig {
         .add("maxFileCount", maxFileCount)
         .add("openFileCost", openFileCost)
         .add("fragmentRatio", fragmentRatio)
+        .add("minTargetSizeRatio", minTargetSizeRatio)
         .add("minorLeastFileCount", minorLeastFileCount)
         .add("minorLeastInterval", minorLeastInterval)
         .add("majorDuplicateRatio", majorDuplicateRatio)
@@ -305,6 +322,7 @@ public class OptimizingConfig {
         .add("baseHashBucket", baseHashBucket)
         .add("baseRefreshInterval", baseRefreshInterval)
         .add("hiveRefreshInterval", hiveRefreshInterval)
+        .add("minPlanInterval", minPlanInterval)
         .toString();
   }
 

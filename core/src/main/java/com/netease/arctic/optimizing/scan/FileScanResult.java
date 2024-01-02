@@ -16,26 +16,27 @@
  * limitations under the License.
  */
 
-package com.netease.arctic.optimizing;
+package com.netease.arctic.optimizing.scan;
 
-import java.io.Serializable;
-import java.util.Map;
+import org.apache.iceberg.ContentFile;
+import org.apache.iceberg.DataFile;
 
-/**
- * A factory to create {@link OptimizingCommitter}.
- *
- * @param <O>
- */
-public interface OptimizingCommitterFactory<O extends TableOptimizing.OptimizingOutput>
-    extends Serializable {
+import java.util.List;
 
-  /** Create an {@link OptimizingCommitter} by OptimizingOutputs of all tasks. */
-  OptimizingCommitter createCommitter(O[] outputs, Map<String, String> properties);
+public class FileScanResult {
+  private final DataFile file;
+  private final List<ContentFile<?>> deleteFiles;
 
-  /** OptimizingCommitter to commit all optimizing result. */
-  interface OptimizingCommitter extends Serializable {
+  public FileScanResult(DataFile file, List<ContentFile<?>> deleteFiles) {
+    this.file = file;
+    this.deleteFiles = deleteFiles;
+  }
 
-    /** Commit all optimizing result. */
-    void commit();
+  public DataFile file() {
+    return file;
+  }
+
+  public List<ContentFile<?>> deleteFiles() {
+    return deleteFiles;
   }
 }

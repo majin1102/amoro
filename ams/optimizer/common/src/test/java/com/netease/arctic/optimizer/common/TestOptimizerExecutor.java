@@ -23,11 +23,9 @@ import com.netease.arctic.ams.api.OptimizerRegisterInfo;
 import com.netease.arctic.ams.api.OptimizingTask;
 import com.netease.arctic.ams.api.OptimizingTaskId;
 import com.netease.arctic.ams.api.OptimizingTaskResult;
-import com.netease.arctic.optimizing.BaseOptimizingInput;
-import com.netease.arctic.optimizing.OptimizingExecutor;
-import com.netease.arctic.optimizing.OptimizingExecutorFactory;
 import com.netease.arctic.optimizing.OptimizingInputProperties;
-import com.netease.arctic.optimizing.TableOptimizing;
+import com.netease.arctic.process.TaskExecutor;
+import com.netease.arctic.process.TaskExecutorFactory;
 import com.netease.arctic.utils.SerializationUtil;
 import org.apache.thrift.TException;
 import org.junit.After;
@@ -59,7 +57,7 @@ public class TestOptimizerExecutor extends OptimizerTestBase {
 
   @Test
   public void testWaitForToken() throws InterruptedException {
-    TEST_AMS.getOptimizerHandler().offerTask(TestOptimizingInput.successInput(1).toTask(0, 0));
+    TEST_AMS.getOptimizerHandler().offerTask(TestTaskInput.successInput(1).toTask(0, 0));
     TimeUnit.MILLISECONDS.sleep(OptimizerTestHelpers.CALL_AMS_INTERVAL * 2);
     Assert.assertEquals(1, TEST_AMS.getOptimizerHandler().getPendingTasks().size());
   }
@@ -69,7 +67,7 @@ public class TestOptimizerExecutor extends OptimizerTestBase {
     TEST_AMS.getOptimizerHandler().authenticate(new OptimizerRegisterInfo());
     String token =
         TEST_AMS.getOptimizerHandler().getRegisteredOptimizers().keySet().iterator().next();
-    TEST_AMS.getOptimizerHandler().offerTask(TestOptimizingInput.successInput(1).toTask(0, 0));
+    TEST_AMS.getOptimizerHandler().offerTask(TestTaskInput.successInput(1).toTask(0, 0));
     Assert.assertEquals(1, TEST_AMS.getOptimizerHandler().getPendingTasks().size());
     optimizerExecutor.setToken(token);
     TimeUnit.MILLISECONDS.sleep(OptimizerTestHelpers.CALL_AMS_INTERVAL * 2);
@@ -80,7 +78,7 @@ public class TestOptimizerExecutor extends OptimizerTestBase {
         TEST_AMS.getOptimizerHandler().getCompletedTasks().get(token).get(0);
     Assert.assertEquals(new OptimizingTaskId(0, 0), taskResult.getTaskId());
     Assert.assertNull(taskResult.getErrorMessage());
-    TestOptimizingOutput output = SerializationUtil.simpleDeserialize(taskResult.getTaskOutput());
+    TestTaskOutput output = SerializationUtil.simpleDeserialize(taskResult.getTaskOutput());
     Assert.assertEquals(1, output.inputId());
   }
 
@@ -89,7 +87,7 @@ public class TestOptimizerExecutor extends OptimizerTestBase {
     TEST_AMS.getOptimizerHandler().authenticate(new OptimizerRegisterInfo());
     String token =
         TEST_AMS.getOptimizerHandler().getRegisteredOptimizers().keySet().iterator().next();
-    TEST_AMS.getOptimizerHandler().offerTask(TestOptimizingInput.failedInput(1).toTask(0, 0));
+    TEST_AMS.getOptimizerHandler().offerTask(TestTaskInput.failedInput(1).toTask(0, 0));
     Assert.assertEquals(1, TEST_AMS.getOptimizerHandler().getPendingTasks().size());
     optimizerExecutor.setToken(token);
     TimeUnit.MILLISECONDS.sleep(OptimizerTestHelpers.CALL_AMS_INTERVAL * 2);
@@ -103,21 +101,21 @@ public class TestOptimizerExecutor extends OptimizerTestBase {
     Assert.assertTrue(taskResult.getErrorMessage().contains(FAILED_TASK_MESSAGE));
   }
 
-  public static class TestOptimizingInput extends BaseOptimizingInput {
+  public static class TestTaskInput implements TaskExecutor.Input {
     private final int inputId;
     private final boolean executeSuccess;
 
-    private TestOptimizingInput(int inputId, boolean executeSuccess) {
+    private TestTaskInput(int inputId, boolean executeSuccess) {
       this.inputId = inputId;
       this.executeSuccess = executeSuccess;
     }
 
-    public static TestOptimizingInput successInput(int inputId) {
-      return new TestOptimizingInput(inputId, true);
+    public static TestTaskInput successInput(int inputId) {
+      return new TestTaskInput(inputId, true);
     }
 
-    public static TestOptimizingInput failedInput(int inputId) {
-      return new TestOptimizingInput(inputId, false);
+    public static TestTaskInput failedInput(int inputId) {
+      return new TestTaskInput(inputId, false);
     }
 
     private int inputId() {
@@ -130,57 +128,68 @@ public class TestOptimizerExecutor extends OptimizerTestBase {
       Map<String, String> inputProperties = Maps.newHashMap();
       inputProperties.put(
           OptimizingInputProperties.TASK_EXECUTOR_FACTORY_IMPL,
-          TestOptimizingExecutorFactory.class.getName());
+          TestTaskExecutorFactory.class.getName());
       optimizingTask.setProperties(inputProperties);
       return optimizingTask;
     }
+
+    @Override
+    public void option(String name, String value) {}
+
+    @Override
+    public void options(Map<String, String> options) {}
+
+    @Override
+    public Map<String, String> getOptions() {
+      return null;
+    }
   }
 
-  public static class TestOptimizingExecutorFactory
-      implements OptimizingExecutorFactory<TestOptimizingInput> {
+  public static class TestTaskExecutorFactory
+      implements TaskExecutorFactory<TestTaskInput, TestTaskOutput> {
 
     @Override
     public void initialize(Map<String, String> properties) {}
 
     @Override
-    public OptimizingExecutor createExecutor(TestOptimizingInput input) {
+    public TaskExecutor<TestTaskOutput> createExecutor(TestTaskInput input) {
       return new TestOptimizingExecutor(input);
     }
   }
 
-  public static class TestOptimizingExecutor implements OptimizingExecutor<TestOptimizingOutput> {
+  public static class TestOptimizingExecutor implements TaskExecutor<TestTaskOutput> {
 
-    private final TestOptimizingInput input;
+    private final TestTaskInput input;
 
-    private TestOptimizingExecutor(TestOptimizingInput input) {
+    private TestOptimizingExecutor(TestTaskInput input) {
       this.input = input;
     }
 
     @Override
-    public TestOptimizingOutput execute() {
+    public TestTaskOutput execute() {
       if (input.executeSuccess) {
-        return new TestOptimizingOutput(input.inputId());
+        return new TestTaskOutput(input.inputId());
       } else {
         throw new IllegalStateException(FAILED_TASK_MESSAGE);
       }
     }
   }
 
-  public static class TestOptimizingOutput implements TableOptimizing.OptimizingOutput {
+  public static class TestTaskOutput implements TaskExecutor.Output {
 
     private final int inputId;
 
-    private TestOptimizingOutput(int inputId) {
+    private TestTaskOutput(int inputId) {
       this.inputId = inputId;
+    }
+
+    private int inputId() {
+      return inputId;
     }
 
     @Override
     public Map<String, String> summary() {
       return null;
-    }
-
-    private int inputId() {
-      return inputId;
     }
   }
 }

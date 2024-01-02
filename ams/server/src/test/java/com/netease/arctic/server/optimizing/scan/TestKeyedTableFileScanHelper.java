@@ -25,10 +25,10 @@ import com.netease.arctic.catalog.BasicCatalogTestHelper;
 import com.netease.arctic.catalog.CatalogTestHelper;
 import com.netease.arctic.data.ChangeAction;
 import com.netease.arctic.io.MixedDataTestHelpers;
+import com.netease.arctic.optimizing.scan.FileScanResult;
+import com.netease.arctic.server.optimizerlegacy.KeyedTableFileScanHelper;
 import com.netease.arctic.server.optimizing.OptimizingTestHelpers;
 import com.netease.arctic.server.table.KeyedTableSnapshot;
-import com.netease.arctic.server.optimizerlegacy.KeyedTableFileScanHelper;
-import com.netease.arctic.server.optimizerlegacy.TableFileScanHelper;
 import com.netease.arctic.server.utils.IcebergTableUtil;
 import com.netease.arctic.table.KeyedTable;
 import com.netease.arctic.table.TableProperties;
@@ -63,7 +63,7 @@ public class TestKeyedTableFileScanHelper extends TableFileScanHelperTestBase {
 
   @Test
   public void testScanEmpty() {
-    List<TableFileScanHelper.FileScanResult> scan = scanFiles();
+    List<FileScanResult> scan = scanFiles();
     assertScanResult(scan, 0);
   }
 
@@ -75,7 +75,7 @@ public class TestKeyedTableFileScanHelper extends TableFileScanHelperTestBase {
         tableTestHelper()
             .writeBaseStore(getArcticTable(), transactionId, Collections.emptyList(), false));
 
-    List<TableFileScanHelper.FileScanResult> scan = scanFiles();
+    List<FileScanResult> scan = scanFiles();
     assertScanResult(scan, 0);
   }
 
@@ -92,7 +92,7 @@ public class TestKeyedTableFileScanHelper extends TableFileScanHelperTestBase {
         getArcticTable(),
         tableTestHelper().writeBaseStore(getArcticTable(), transactionId, newRecords, false));
 
-    List<TableFileScanHelper.FileScanResult> scan = scanFiles();
+    List<FileScanResult> scan = scanFiles();
 
     assertScanResult(scan, 4, transactionId, 0);
   }
@@ -112,7 +112,7 @@ public class TestKeyedTableFileScanHelper extends TableFileScanHelperTestBase {
                 getArcticTable(), transactionId, ChangeAction.INSERT, newRecords, false));
     long sequenceNumber = getArcticTable().changeTable().currentSnapshot().sequenceNumber();
 
-    List<TableFileScanHelper.FileScanResult> scan = scanFiles();
+    List<FileScanResult> scan = scanFiles();
 
     assertScanResult(scan, 4, sequenceNumber, 0);
   }
@@ -150,7 +150,7 @@ public class TestKeyedTableFileScanHelper extends TableFileScanHelperTestBase {
             .writeChangeStore(
                 getArcticTable(), transactionId, ChangeAction.INSERT, newRecords, false));
 
-    List<TableFileScanHelper.FileScanResult> scan = scanFiles();
+    List<FileScanResult> scan = scanFiles();
 
     assertScanResult(scan, 8, 1);
 
@@ -187,7 +187,7 @@ public class TestKeyedTableFileScanHelper extends TableFileScanHelperTestBase {
     }
     OptimizingTestHelpers.appendBasePosDelete(getArcticTable(), posDeleteFiles);
 
-    List<TableFileScanHelper.FileScanResult> scan = scanFiles();
+    List<FileScanResult> scan = scanFiles();
 
     assertScanResult(scan, 4, transactionId, 1);
   }
@@ -215,7 +215,7 @@ public class TestKeyedTableFileScanHelper extends TableFileScanHelperTestBase {
             .writeChangeStore(getArcticTable(), null, ChangeAction.INSERT, newRecords, false));
 
     // check all files
-    List<TableFileScanHelper.FileScanResult> scan = scanFiles();
+    List<FileScanResult> scan = scanFiles();
 
     assertScanResult(scan, 12, 0);
 

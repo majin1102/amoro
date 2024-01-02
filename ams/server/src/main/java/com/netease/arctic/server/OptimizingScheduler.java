@@ -81,6 +81,7 @@ public class OptimizingScheduler extends TaskScheduler<DefaultOptimizingState> {
         tableRuntimeMap.put(tableRuntime.getTableIdentifier(), tableRuntime);
         allTargetQuota +=
             tableRuntime.getTableConfiguration().getOptimizingConfig().getTargetQuota();
+        // TODO wangtaohz print info log too frequently
         LOG.info(
             "Bind queue {} success with table {}",
             optimizerGroup.getName(),

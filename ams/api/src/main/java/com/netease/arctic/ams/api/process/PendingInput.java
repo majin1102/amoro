@@ -1,13 +1,16 @@
 package com.netease.arctic.ams.api.process;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.apache.iceberg.StructLike;
 import org.apache.iceberg.relocated.com.google.common.base.MoreObjects;
-import org.apache.iceberg.relocated.com.google.common.collect.Sets;
+import org.apache.iceberg.relocated.com.google.common.collect.Maps;
 
+import java.util.Map;
 import java.util.Set;
 
 public class PendingInput {
 
-  private final Set<String> partitions = Sets.newHashSet();
+  @JsonIgnore private final Map<Integer, Set<StructLike>> partitions = Maps.newHashMap();
 
   private int dataFileCount = 0;
   private long dataFileSize = 0;
@@ -25,7 +28,7 @@ public class PendingInput {
   public PendingInput() {}
 
   public PendingInput(
-      Set<String> partitions,
+      Map<Integer, Set<StructLike>> partitions,
       int dataFileCount,
       long dataFileSize,
       int equalityDeleteFileCount,
@@ -34,7 +37,7 @@ public class PendingInput {
       long equalityDeleteBytes,
       boolean needMinorOptimizing,
       boolean needMajorOptimizing) {
-    this.partitions.addAll(partitions);
+    this.partitions.putAll(partitions);
     this.dataFileCount = dataFileCount;
     this.dataFileSize = dataFileSize;
     this.equalityDeleteFileCount = equalityDeleteFileCount;
@@ -53,7 +56,7 @@ public class PendingInput {
     return dataFileSize + equalityDeleteBytes + positionalDeleteBytes;
   }
 
-  public Set<String> getPartitions() {
+  public Map<Integer, Set<StructLike>> getPartitions() {
     return partitions;
   }
 

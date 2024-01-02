@@ -56,6 +56,7 @@ public class TaskRuntime<I, O> extends StatedPersistentBase implements QuotaCons
   private Map<String, String> properties;
   private TaskSummary<I, O> summaryBuilder;
 
+  // TODO wangtaohz completedFuture
   private volatile SimpleFuture completedFutuer = new SimpleFuture();
 
   private TaskRuntime() {}
@@ -307,7 +308,7 @@ public class TaskRuntime<I, O> extends StatedPersistentBase implements QuotaCons
   }
 
   public enum Status {
-    PLANNED,
+    PLANNED, // TODO wangtaohz refactor it to INIT
     SCHEDULED,
     ACKED,
     FAILED,

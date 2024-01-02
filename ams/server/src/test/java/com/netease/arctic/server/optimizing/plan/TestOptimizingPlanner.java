@@ -23,8 +23,7 @@ import com.netease.arctic.TableTestHelper;
 import com.netease.arctic.ams.api.TableFormat;
 import com.netease.arctic.catalog.BasicCatalogTestHelper;
 import com.netease.arctic.catalog.CatalogTestHelper;
-import com.netease.arctic.server.optimizerlegacy.TableFileScanHelper;
-import com.netease.arctic.server.process.OptimizingType;
+import com.netease.arctic.optimizing.scan.FileScanResult;
 import com.netease.arctic.server.process.optimizing.TaskDescriptor;
 import org.apache.iceberg.DataFile;
 import org.junit.Assert;
@@ -69,9 +68,7 @@ public class TestOptimizingPlanner extends TestOptimizingEvaluator {
     List<TaskDescriptor> taskDescriptors = optimizingEvaluator.planTasks();
     Assert.assertEquals(1, taskDescriptors.size());
     List<DataFile> dataFiles =
-        scanFiles().stream()
-            .map(TableFileScanHelper.FileScanResult::file)
-            .collect(Collectors.toList());
+        scanFiles().stream().map(FileScanResult::file).collect(Collectors.toList());
     assertTask(
         taskDescriptors.get(0),
         dataFiles,

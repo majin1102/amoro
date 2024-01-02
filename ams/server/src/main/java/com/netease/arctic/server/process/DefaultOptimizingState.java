@@ -25,6 +25,7 @@ import com.netease.arctic.ams.api.StateField;
 import com.netease.arctic.ams.api.process.OptimizingStage;
 import com.netease.arctic.ams.api.process.OptimizingState;
 import com.netease.arctic.ams.api.process.ProcessStatus;
+import com.netease.arctic.optimizing.OptimizingType;
 import com.netease.arctic.server.persistence.OptimizingStatePersistency;
 import com.netease.arctic.server.persistence.StatedPersistentBase;
 import com.netease.arctic.server.persistence.mapper.ProcessMapper;
@@ -92,6 +93,7 @@ public class DefaultOptimizingState extends OptimizingState {
         });
   }
 
+  // TODO wangtaohz method name should be saveProcessRecovered
   protected void saveProcessRecoverd(DefaultOptimizingProcess process) {
     optimizingProcess = process;
   }

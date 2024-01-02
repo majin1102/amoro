@@ -20,12 +20,12 @@ package com.netease.arctic.server.optimizing;
 
 import com.google.common.collect.Maps;
 import com.netease.arctic.ams.api.properties.CatalogMetaProperties;
+import com.netease.arctic.optimizing.OptimizingType;
 import com.netease.arctic.server.AmsEnvironment;
 import com.netease.arctic.server.RestCatalogService;
 import com.netease.arctic.server.catalog.InternalCatalog;
 import com.netease.arctic.server.catalog.ServerCatalog;
 import com.netease.arctic.server.persistence.OptimizingStatePersistency;
-import com.netease.arctic.server.process.OptimizingType;
 import com.netease.arctic.table.TableMetaStore;
 import com.netease.arctic.table.TableProperties;
 import org.apache.iceberg.CatalogUtil;

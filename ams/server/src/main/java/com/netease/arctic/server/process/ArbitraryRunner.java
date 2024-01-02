@@ -21,7 +21,4 @@ public class ArbitraryRunner extends SingletonActionRunner<TableState> {
 
   @Override
   protected void handleCompleted(AmoroProcess<TableState> process) {}
-
-  @Override
-  protected void handleSubmitted(AmoroProcess<TableState> process) {}
 }

@@ -2,10 +2,10 @@ package com.netease.arctic.optimizer.common;
 
 import com.netease.arctic.ams.api.OptimizingTask;
 import com.netease.arctic.ams.api.OptimizingTaskResult;
-import com.netease.arctic.optimizing.OptimizingExecutor;
-import com.netease.arctic.optimizing.OptimizingExecutorFactory;
 import com.netease.arctic.optimizing.OptimizingInputProperties;
 import com.netease.arctic.optimizing.TableOptimizing;
+import com.netease.arctic.process.TaskExecutor;
+import com.netease.arctic.process.TaskExecutorFactory;
 import com.netease.arctic.utils.ExceptionUtil;
 import com.netease.arctic.utils.SerializationUtil;
 import org.apache.iceberg.common.DynConstructors;
@@ -88,11 +88,11 @@ public class OptimizerExecutor extends AbstractOptimizerOperator {
       String executorFactoryImpl = properties.getExecutorFactoryImpl();
       TableOptimizing.OptimizingInput input =
           SerializationUtil.simpleDeserialize(task.getTaskInput());
-      DynConstructors.Ctor<OptimizingExecutorFactory> ctor =
-          DynConstructors.builder(OptimizingExecutorFactory.class)
+      DynConstructors.Ctor<TaskExecutorFactory> ctor =
+          DynConstructors.builder(TaskExecutorFactory.class)
               .impl(executorFactoryImpl)
               .buildChecked();
-      OptimizingExecutorFactory factory = ctor.newInstance();
+      TaskExecutorFactory factory = ctor.newInstance();
 
       if (getConfig().isExtendDiskStorage()) {
         properties.enableSpillMap();
@@ -101,8 +101,8 @@ public class OptimizerExecutor extends AbstractOptimizerOperator {
       properties.setSpillMapPath(getConfig().getDiskStoragePath());
       factory.initialize(properties.getProperties());
 
-      OptimizingExecutor executor = factory.createExecutor(input);
-      TableOptimizing.OptimizingOutput output = executor.execute();
+      TaskExecutor executor = factory.createExecutor(input);
+      TaskExecutor.Output output = executor.execute();
       ByteBuffer outputByteBuffer = SerializationUtil.simpleSerialize(output);
       OptimizingTaskResult result = new OptimizingTaskResult(task.getTaskId(), threadId);
       result.setTaskOutput(outputByteBuffer);

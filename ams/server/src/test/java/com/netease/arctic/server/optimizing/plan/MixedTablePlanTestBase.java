@@ -20,6 +20,8 @@ package com.netease.arctic.server.optimizing.plan;
 
 import com.google.common.collect.Maps;
 import com.netease.arctic.TableTestHelper;
+import com.netease.arctic.ams.api.ServerTableIdentifier;
+import com.netease.arctic.ams.api.config.OptimizingConfig;
 import com.netease.arctic.catalog.CatalogTestHelper;
 import com.netease.arctic.catalog.TableTestBase;
 import com.netease.arctic.data.DataTreeNode;
@@ -27,13 +29,10 @@ import com.netease.arctic.data.PrimaryKeyedFile;
 import com.netease.arctic.hive.optimizing.MixFormatRewriteExecutorFactory;
 import com.netease.arctic.io.MixedDataTestHelpers;
 import com.netease.arctic.optimizing.OptimizingInputProperties;
+import com.netease.arctic.optimizing.scan.FileScanResult;
 import com.netease.arctic.server.ArcticServiceConstants;
 import com.netease.arctic.server.dashboard.utils.AmsUtil;
-import com.netease.arctic.ams.api.config.OptimizingConfig;
 import com.netease.arctic.server.optimizing.OptimizingTestHelpers;
-import com.netease.arctic.server.optimizerlegacy.TableFileScanHelper;
-import com.netease.arctic.server.process.optimizing.TaskDescriptor;
-import com.netease.arctic.ams.api.ServerTableIdentifier;
 import com.netease.arctic.server.table.DefaultTableRuntime;
 import com.netease.arctic.server.utils.IcebergTableUtil;
 import com.netease.arctic.table.TableProperties;
@@ -334,9 +333,8 @@ public abstract class MixedTablePlanTestBase extends TableTestBase {
   protected AbstractPartitionPlan buildPlanWithCurrentFiles() {
     TableFileScanHelper tableFileScanHelper = getTableFileScanHelper();
     AbstractPartitionPlan partitionPlan = getAndCheckPartitionPlan();
-    try (CloseableIterable<TableFileScanHelper.FileScanResult> results =
-        tableFileScanHelper.scan()) {
-      for (TableFileScanHelper.FileScanResult fileScanResult : results) {
+    try (CloseableIterable<FileScanResult> results = tableFileScanHelper.scan()) {
+      for (FileScanResult fileScanResult : results) {
         partitionPlan.addFile(fileScanResult.file(), fileScanResult.deleteFiles());
       }
     } catch (IOException e) {
@@ -445,12 +443,11 @@ public abstract class MixedTablePlanTestBase extends TableTestBase {
     return properties;
   }
 
-  protected Map<DataTreeNode, List<TableFileScanHelper.FileScanResult>> scanBaseFilesGroupByNode() {
+  protected Map<DataTreeNode, List<FileScanResult>> scanBaseFilesGroupByNode() {
     TableFileScanHelper tableFileScanHelper = getTableFileScanHelper();
-    Map<DataTreeNode, List<TableFileScanHelper.FileScanResult>> resultMap = Maps.newHashMap();
-    try (CloseableIterable<TableFileScanHelper.FileScanResult> results =
-        tableFileScanHelper.scan()) {
-      for (TableFileScanHelper.FileScanResult result : results) {
+    Map<DataTreeNode, List<FileScanResult>> resultMap = Maps.newHashMap();
+    try (CloseableIterable<FileScanResult> results = tableFileScanHelper.scan()) {
+      for (FileScanResult result : results) {
         PrimaryKeyedFile primaryKeyedFile = (PrimaryKeyedFile) result.file();
         resultMap.putIfAbsent(primaryKeyedFile.node(), Lists.newArrayList());
         resultMap.get(primaryKeyedFile.node()).add(result);
@@ -461,10 +458,9 @@ public abstract class MixedTablePlanTestBase extends TableTestBase {
     return resultMap;
   }
 
-  protected List<TableFileScanHelper.FileScanResult> scanFiles() {
+  protected List<FileScanResult> scanFiles() {
     TableFileScanHelper tableFileScanHelper = getTableFileScanHelper();
-    try (CloseableIterable<TableFileScanHelper.FileScanResult> results =
-        tableFileScanHelper.scan()) {
+    try (CloseableIterable<FileScanResult> results = tableFileScanHelper.scan()) {
       return Lists.newArrayList(results.iterator());
     } catch (IOException e) {
       throw new UncheckedIOException(e);

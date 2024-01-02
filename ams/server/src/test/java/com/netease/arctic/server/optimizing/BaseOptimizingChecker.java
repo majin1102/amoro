@@ -1,9 +1,9 @@
 package com.netease.arctic.server.optimizing;
 
+import com.netease.arctic.optimizing.OptimizingType;
 import com.netease.arctic.server.persistence.OptimizingStatePersistency;
 import com.netease.arctic.server.persistence.PersistentBase;
 import com.netease.arctic.server.persistence.mapper.OptimizingMapper;
-import com.netease.arctic.server.process.OptimizingType;
 import com.netease.arctic.table.TableIdentifier;
 import org.apache.iceberg.data.Record;
 import org.apache.iceberg.relocated.com.google.common.collect.Sets;

@@ -18,8 +18,8 @@
 
 package com.netease.arctic.server.optimizing;
 
+import com.netease.arctic.optimizing.OptimizingType;
 import com.netease.arctic.server.persistence.OptimizingStatePersistency;
-import com.netease.arctic.server.process.OptimizingType;
 import com.netease.arctic.table.ArcticTable;
 import com.netease.arctic.table.KeyedTable;
 import com.netease.arctic.table.TableProperties;

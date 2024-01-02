@@ -33,6 +33,7 @@ public class TableState implements ProcessState {
   @StateField private long endTime = -1L;
   @StateField private ProcessStatus status = ProcessStatus.RUNNING;
   @StateField private volatile String failedReason;
+  // TODO wangtaohz use Map<String, String> as summary?
   private volatile String summary;
 
   public TableState(Action action, ServerTableIdentifier tableIdentifier) {

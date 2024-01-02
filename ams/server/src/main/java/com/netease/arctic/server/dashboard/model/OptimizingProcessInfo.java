@@ -23,7 +23,6 @@ import com.netease.arctic.server.dashboard.utils.FilesStatisticsBuilder;
 import com.netease.arctic.server.persistence.OptimizingStatePersistency;
 import com.netease.arctic.server.persistence.TaskRuntimePersistency;
 import com.netease.arctic.server.process.OptimizingSummary;
-import com.netease.arctic.server.process.OptimizingType;
 
 import java.util.List;
 
