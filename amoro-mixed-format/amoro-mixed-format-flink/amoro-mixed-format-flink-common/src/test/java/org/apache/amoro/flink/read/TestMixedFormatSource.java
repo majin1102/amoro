@@ -26,6 +26,7 @@ import static org.apache.flink.util.Preconditions.checkArgument;
 import static org.apache.flink.util.Preconditions.checkNotNull;
 
 import org.apache.amoro.BasicTableTestHelper;
+import org.apache.amoro.TableIdentifier;
 import org.apache.amoro.TableTestHelper;
 import org.apache.amoro.flink.read.hybrid.reader.ReaderFunction;
 import org.apache.amoro.flink.read.hybrid.reader.RowDataReaderFunction;
@@ -39,7 +40,6 @@ import org.apache.amoro.flink.write.FlinkSink;
 import org.apache.amoro.mixed.MixedFormatCatalog;
 import org.apache.amoro.table.KeyedTable;
 import org.apache.amoro.table.MixedTable;
-import org.apache.amoro.table.TableIdentifier;
 import org.apache.amoro.table.UnkeyedTable;
 import org.apache.amoro.utils.TableFileUtil;
 import org.apache.flink.api.common.JobID;

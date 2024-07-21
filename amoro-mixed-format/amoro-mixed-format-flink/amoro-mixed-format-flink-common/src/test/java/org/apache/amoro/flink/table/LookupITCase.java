@@ -20,12 +20,12 @@ package org.apache.amoro.flink.table;
 
 import org.apache.amoro.BasicTableTestHelper;
 import org.apache.amoro.TableFormat;
+import org.apache.amoro.TableIdentifier;
 import org.apache.amoro.catalog.BasicCatalogTestHelper;
 import org.apache.amoro.flink.util.DataUtil;
 import org.apache.amoro.flink.write.FlinkTaskWriterBaseTest;
 import org.apache.amoro.shade.guava32.com.google.common.collect.Lists;
 import org.apache.amoro.table.MixedTable;
-import org.apache.amoro.table.TableIdentifier;
 import org.apache.flink.table.api.TableResult;
 import org.apache.flink.table.data.RowData;
 import org.apache.flink.table.types.logical.RowType;

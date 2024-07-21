@@ -18,13 +18,13 @@
 
 package org.apache.amoro.flink.table;
 
+import org.apache.amoro.TableIdentifier;
 import org.apache.amoro.flink.InternalCatalogBuilder;
 import org.apache.amoro.flink.catalog.factories.CatalogFactoryOptions;
 import org.apache.amoro.flink.interceptor.FlinkTablePropertiesInvocationHandler;
 import org.apache.amoro.mixed.MixedFormatCatalog;
 import org.apache.amoro.shade.guava32.com.google.common.base.MoreObjects;
 import org.apache.amoro.table.MixedTable;
-import org.apache.amoro.table.TableIdentifier;
 import org.apache.iceberg.Table;
 import org.apache.iceberg.flink.TableLoader;
 

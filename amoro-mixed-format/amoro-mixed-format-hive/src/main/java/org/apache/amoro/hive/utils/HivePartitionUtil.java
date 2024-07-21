@@ -18,11 +18,11 @@
 
 package org.apache.amoro.hive.utils;
 
+import org.apache.amoro.TableIdentifier;
 import org.apache.amoro.hive.HMSClient;
 import org.apache.amoro.hive.HMSClientPool;
 import org.apache.amoro.shade.guava32.com.google.common.collect.Lists;
 import org.apache.amoro.table.MixedTable;
-import org.apache.amoro.table.TableIdentifier;
 import org.apache.hadoop.hive.metastore.PartitionDropOptions;
 import org.apache.hadoop.hive.metastore.api.NoSuchObjectException;
 import org.apache.hadoop.hive.metastore.api.Partition;

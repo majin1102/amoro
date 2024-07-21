@@ -18,10 +18,10 @@
 
 package org.apache.amoro.hive.utils;
 
+import org.apache.amoro.TableIdentifier;
 import org.apache.amoro.hive.HMSClientPool;
 import org.apache.amoro.properties.HiveTableProperties;
 import org.apache.amoro.shade.guava32.com.google.common.collect.Maps;
-import org.apache.amoro.table.TableIdentifier;
 import org.apache.amoro.utils.IdGenerator;
 import org.apache.hadoop.hive.metastore.api.NoSuchObjectException;
 import org.apache.hadoop.hive.metastore.api.SerDeInfo;

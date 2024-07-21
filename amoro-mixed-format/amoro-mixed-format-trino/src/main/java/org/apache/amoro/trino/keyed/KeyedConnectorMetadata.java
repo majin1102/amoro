@@ -62,7 +62,7 @@ import org.apache.amoro.shade.guava32.com.google.common.collect.ImmutableSet;
 import org.apache.amoro.shade.guava32.com.google.common.collect.Lists;
 import org.apache.amoro.table.KeyedTable;
 import org.apache.amoro.table.MixedTable;
-import org.apache.amoro.table.TableIdentifier;
+import org.apache.amoro.TableIdentifier;
 import org.apache.amoro.trino.MixedFormatSessionProperties;
 import org.apache.amoro.trino.util.ObjectSerializerUtil;
 import org.apache.iceberg.PartitionSpecParser;

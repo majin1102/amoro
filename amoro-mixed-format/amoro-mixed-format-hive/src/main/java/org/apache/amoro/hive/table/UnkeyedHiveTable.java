@@ -21,6 +21,7 @@ package org.apache.amoro.hive.table;
 import static org.apache.amoro.properties.HiveTableProperties.BASE_HIVE_LOCATION_ROOT;
 
 import org.apache.amoro.TableFormat;
+import org.apache.amoro.TableIdentifier;
 import org.apache.amoro.hive.HMSClientPool;
 import org.apache.amoro.hive.op.HiveOperationTransaction;
 import org.apache.amoro.hive.op.HiveSchemaUpdate;
@@ -33,7 +34,6 @@ import org.apache.amoro.io.AuthenticatedHadoopFileIO;
 import org.apache.amoro.properties.HiveTableProperties;
 import org.apache.amoro.table.BaseTable;
 import org.apache.amoro.table.BasicUnkeyedTable;
-import org.apache.amoro.table.TableIdentifier;
 import org.apache.amoro.table.UnkeyedTable;
 import org.apache.iceberg.ReplacePartitions;
 import org.apache.iceberg.Schema;

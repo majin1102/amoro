@@ -19,9 +19,9 @@
 package org.apache.amoro.trino.mixed;
 
 import static org.apache.amoro.MockAmoroManagementServer.TEST_CATALOG_NAME;
-import static org.apache.amoro.table.TableProperties.BASE_FILE_FORMAT;
-import static org.apache.amoro.table.TableProperties.CHANGE_FILE_FORMAT;
-import static org.apache.amoro.table.TableProperties.DEFAULT_FILE_FORMAT;
+import static org.apache.amoro.properties.TableProperties.BASE_FILE_FORMAT;
+import static org.apache.amoro.properties.TableProperties.CHANGE_FILE_FORMAT;
+import static org.apache.amoro.properties.TableProperties.DEFAULT_FILE_FORMAT;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import io.trino.sql.query.QueryAssertions;
@@ -38,8 +38,8 @@ import org.apache.amoro.table.BaseLocationKind;
 import org.apache.amoro.table.ChangeLocationKind;
 import org.apache.amoro.table.LocationKind;
 import org.apache.amoro.table.MixedTable;
-import org.apache.amoro.table.TableIdentifier;
-import org.apache.amoro.table.TableProperties;
+import org.apache.amoro.TableIdentifier;
+import org.apache.amoro.properties.TableProperties;
 import org.apache.iceberg.AppendFiles;
 import org.apache.iceberg.FileFormat;
 import org.apache.iceberg.Files;

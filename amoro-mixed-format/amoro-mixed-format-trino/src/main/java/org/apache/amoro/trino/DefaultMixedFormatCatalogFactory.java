@@ -22,7 +22,7 @@ import io.trino.spi.classloader.ThreadContextClassLoader;
 import org.apache.amoro.api.CatalogMeta;
 import org.apache.amoro.mixed.CatalogLoader;
 import org.apache.amoro.mixed.MixedFormatCatalog;
-import org.apache.amoro.table.TableMetaStore;
+import org.apache.amoro.TableMetaStore;
 import org.apache.amoro.utils.MixedCatalogUtil;
 
 import javax.inject.Inject;

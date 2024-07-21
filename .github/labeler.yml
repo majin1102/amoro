@@ -41,14 +41,14 @@
   - "docs/**/*"
 
 "module:core":
-  - "amoro-core/**/*"
+  - "amoro-iceberg/**/*"
 
 "module:ams-server":
-  - "amoro-ams/amoro-ams-api/**/*"
+  - "amoro-ams/amoro-api/**/*"
   - "amoro-ams/amoro-ams-server/**/*"
 
 "module:ams-dashboard":
-  - "amoro-ams/amoro-ams-dashboard/**/*"
+  - "amoro-ams/amoro-admin/**/*"
 
 "module:ams-optimizer":
   - "amoro-ams/amoro-ams-optimizer/**/*"

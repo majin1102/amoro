@@ -18,17 +18,17 @@
 
 package org.apache.amoro.spark.util;
 
-import static org.apache.amoro.table.TableProperties.WRITE_DISTRIBUTION_MODE;
-import static org.apache.amoro.table.TableProperties.WRITE_DISTRIBUTION_MODE_DEFAULT;
+import static org.apache.amoro.table.IcebergTableProps.WRITE_DISTRIBUTION_MODE;
+import static org.apache.amoro.table.IcebergTableProps.WRITE_DISTRIBUTION_MODE_DEFAULT;
 import static org.apache.iceberg.spark.Spark3Util.toTransforms;
 
+import org.apache.amoro.properties.TableProperties;
 import org.apache.amoro.shade.guava32.com.google.common.base.Joiner;
 import org.apache.amoro.shade.guava32.com.google.common.base.Preconditions;
 import org.apache.amoro.spark.table.MixedSparkTable;
 import org.apache.amoro.table.DistributionHashMode;
 import org.apache.amoro.table.MixedTable;
 import org.apache.amoro.table.PrimaryKeySpec;
-import org.apache.amoro.table.TableProperties;
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.util.Utf8;
 import org.apache.iceberg.DistributionMode;

@@ -22,7 +22,7 @@ import io.trino.hdfs.authentication.GenericExceptionAction;
 import io.trino.hdfs.authentication.HdfsAuthentication;
 import io.trino.spi.classloader.ThreadContextClassLoader;
 import io.trino.spi.security.ConnectorIdentity;
-import org.apache.amoro.table.TableMetaStore;
+import org.apache.amoro.TableMetaStore;
 
 import javax.inject.Inject;
 

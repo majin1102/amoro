@@ -20,11 +20,12 @@ package org.apache.amoro.spark;
 
 import org.apache.amoro.AmoroTable;
 import org.apache.amoro.Constants;
-import org.apache.amoro.FormatCatalogFactory;
 import org.apache.amoro.TableFormat;
 import org.apache.amoro.TableIDWithFormat;
-import org.apache.amoro.UnifiedCatalog;
-import org.apache.amoro.UnifiedCatalogLoader;
+import org.apache.amoro.catalog.FormatCatalogFactory;
+import org.apache.amoro.catalog.UnifiedCatalog;
+import org.apache.amoro.catalog.UnifiedCatalogLoader;
+import org.apache.amoro.catalog.UnifiedCatalogUtil;
 import org.apache.amoro.client.AmsThriftUrl;
 import org.apache.amoro.shade.guava32.com.google.common.base.Preconditions;
 import org.apache.amoro.shade.guava32.com.google.common.collect.ImmutableMap;
@@ -316,7 +317,8 @@ public class SparkUnifiedCatalogBase implements TableCatalog, SupportsNamespaces
 
       if (tableCatalog instanceof SupportAuthentication) {
         ((SupportAuthentication) tableCatalog)
-            .setAuthenticationContext(unifiedCatalog.authenticationContext());
+            .setAuthenticationContext(
+                UnifiedCatalogUtil.buildMetaStore(unifiedCatalog.getMetadata()));
         tableCatalogInitializeProperties.put("register-name", unifiedCatalog.name());
       }
       tableCatalog.initialize(name, new CaseInsensitiveStringMap(tableCatalogInitializeProperties));

@@ -22,6 +22,7 @@ import org.apache.amoro.TableFormat;
 import org.apache.amoro.hive.io.HiveDataTestHelpers;
 import org.apache.amoro.hive.table.SupportHive;
 import org.apache.amoro.properties.HiveTableProperties;
+import org.apache.amoro.properties.TableProperties;
 import org.apache.amoro.shade.guava32.com.google.common.collect.Iterators;
 import org.apache.amoro.shade.guava32.com.google.common.collect.Lists;
 import org.apache.amoro.spark.io.TaskWriters;
@@ -29,9 +30,9 @@ import org.apache.amoro.spark.reader.SparkParquetReaders;
 import org.apache.amoro.spark.test.MixedTableTestBase;
 import org.apache.amoro.spark.test.utils.RecordGenerator;
 import org.apache.amoro.spark.test.utils.TestTableUtil;
+import org.apache.amoro.table.IcebergTableProps;
 import org.apache.amoro.table.MixedTable;
 import org.apache.amoro.table.PrimaryKeySpec;
-import org.apache.amoro.table.TableProperties;
 import org.apache.iceberg.DataFile;
 import org.apache.iceberg.FileFormat;
 import org.apache.iceberg.Files;
@@ -193,7 +194,7 @@ public class TestMixedWriter extends MixedTableTestBase {
                     .withPrimaryKeySpec(keySpec)
                     .withProperty(TableProperties.CHANGE_FILE_FORMAT, fileFormat.name())
                     .withProperty(TableProperties.BASE_FILE_FORMAT, fileFormat.name())
-                    .withProperty(TableProperties.DEFAULT_FILE_FORMAT, fileFormat.name())
+                    .withProperty(IcebergTableProps.DEFAULT_FILE_FORMAT, fileFormat.name())
                     .withPartitionSpec(ptSpec));
     Map<String, String> map = new HashMap<>();
     map.put(WriteMode.WRITE_MODE_KEY, writeMode.mode);

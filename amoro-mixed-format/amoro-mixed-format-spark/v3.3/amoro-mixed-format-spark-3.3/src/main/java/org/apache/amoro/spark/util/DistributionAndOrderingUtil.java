@@ -20,6 +20,7 @@ package org.apache.amoro.spark.util;
 
 import static org.apache.iceberg.spark.Spark3Util.toTransforms;
 
+import org.apache.amoro.properties.TableProperties;
 import org.apache.amoro.shade.guava32.com.google.common.collect.Lists;
 import org.apache.amoro.shade.guava32.com.google.common.collect.ObjectArrays;
 import org.apache.amoro.spark.SparkAdapterLoader;
@@ -27,7 +28,6 @@ import org.apache.amoro.spark.sql.connector.expressions.FileIndexBucket;
 import org.apache.amoro.table.DistributionHashMode;
 import org.apache.amoro.table.MixedTable;
 import org.apache.amoro.table.PrimaryKeySpec;
-import org.apache.amoro.table.TableProperties;
 import org.apache.iceberg.MetadataColumns;
 import org.apache.iceberg.PartitionField;
 import org.apache.iceberg.PartitionSpec;

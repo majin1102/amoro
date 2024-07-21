@@ -29,7 +29,7 @@
 
     <groupId>org.apache.amoro</groupId>
     <artifactId>amoro-parent</artifactId>
-    <version>0.7-SNAPSHOT</version>
+    <version>0.8-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Amoro Project Parent</name>
@@ -46,8 +46,13 @@
     </licenses>
 
     <modules>
-        <module>amoro-core</module>
+        <module>amoro-api</module>
+        <module>amoro-admin</module>
         <module>amoro-ams</module>
+        <module>amoro-iceberg</module>
+        <module>amoro-scheduler</module>
+        <module>amoro-metrics</module>
+        <module>amoro-optimizer</module>
         <module>amoro-mixed-format</module>
     </modules>
 
@@ -133,7 +138,7 @@
         <prometheus.version>0.16.0</prometheus.version>
         <flink.version>1.18.1</flink.version>
         <fabric8-kubernetes-client.version.version>6.12.1</fabric8-kubernetes-client.version.version>
-        <amoro-shade.version>0.7-SNAPSHOT</amoro-shade.version>
+        <amoro-shade.version>0.8-SNAPSHOT</amoro-shade.version>
         <amoro-shade-guava.version>32.1.1-jre</amoro-shade-guava.version>
         <amoro-shade-jackson.version>2.14.2</amoro-shade-jackson.version>
         <amoro-shade-zookeeper.version>3.9.1</amoro-shade-zookeeper.version>
@@ -228,13 +233,13 @@
         <dependencies>
             <dependency>
                 <groupId>org.apache.amoro</groupId>
-                <artifactId>amoro-ams-api</artifactId>
+                <artifactId>amoro-api</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>org.apache.amoro</groupId>
-                <artifactId>amoro-core</artifactId>
+                <artifactId>amoro-iceberg</artifactId>
                 <version>${project.version}</version>
             </dependency>
 

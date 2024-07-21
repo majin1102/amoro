@@ -20,7 +20,7 @@ on:
     paths:
       - ".github/workflows/**"
       - "amoro-ams/**"
-      - "amoro-core/**"
+      - "amoro-iceberg/**"
       - "amoro-mixed-format/amoro-mixed-format-hive/**"
       - "amoro-mixed-format/amoro-mixed-format-trino/**"
       - "pom.xml"

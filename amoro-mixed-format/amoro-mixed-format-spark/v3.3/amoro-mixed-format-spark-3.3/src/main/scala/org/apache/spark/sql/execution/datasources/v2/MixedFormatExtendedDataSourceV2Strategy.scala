@@ -53,7 +53,7 @@ import org.apache.spark.sql.errors.QueryCompilationErrors
 import org.apache.spark.sql.execution.SparkPlan
 import org.apache.spark.sql.execution.datasources.DataSourceStrategy
 
-import org.apache.amoro.UnifiedCatalog
+import org.apache.amoro.catalog.UnifiedCatalog
 import org.apache.amoro.spark.{SparkUnifiedCatalog, SparkUnifiedSessionCatalog}
 
 /**

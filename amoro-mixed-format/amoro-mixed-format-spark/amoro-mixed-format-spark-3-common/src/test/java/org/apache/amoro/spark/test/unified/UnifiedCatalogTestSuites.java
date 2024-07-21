@@ -20,8 +20,8 @@ package org.apache.amoro.spark.test.unified;
 
 import org.apache.amoro.AmoroTable;
 import org.apache.amoro.TableFormat;
-import org.apache.amoro.UnifiedCatalog;
-import org.apache.amoro.UnifiedCatalogLoader;
+import org.apache.amoro.catalog.UnifiedCatalog;
+import org.apache.amoro.catalog.UnifiedCatalogLoader;
 import org.apache.amoro.shade.guava32.com.google.common.collect.ImmutableMap;
 import org.apache.amoro.shade.guava32.com.google.common.collect.Lists;
 import org.apache.amoro.shade.guava32.com.google.common.collect.Maps;

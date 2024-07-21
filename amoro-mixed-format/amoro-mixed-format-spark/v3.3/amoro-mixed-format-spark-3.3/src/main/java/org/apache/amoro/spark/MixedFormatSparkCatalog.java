@@ -22,6 +22,7 @@ import static org.apache.amoro.spark.mixed.SparkSQLProperties.USE_TIMESTAMP_WITH
 import static org.apache.amoro.spark.mixed.SparkSQLProperties.USE_TIMESTAMP_WITHOUT_TIME_ZONE_IN_NEW_TABLES_DEFAULT;
 import static org.apache.iceberg.spark.SparkSQLProperties.HANDLE_TIMESTAMP_WITHOUT_TIMEZONE;
 
+import org.apache.amoro.TableIdentifier;
 import org.apache.amoro.hive.utils.CatalogUtil;
 import org.apache.amoro.shade.guava32.com.google.common.base.Preconditions;
 import org.apache.amoro.shade.guava32.com.google.common.collect.Maps;
@@ -34,7 +35,6 @@ import org.apache.amoro.table.KeyedTable;
 import org.apache.amoro.table.MixedTable;
 import org.apache.amoro.table.PrimaryKeySpec;
 import org.apache.amoro.table.TableBuilder;
-import org.apache.amoro.table.TableIdentifier;
 import org.apache.amoro.table.UnkeyedTable;
 import org.apache.iceberg.PartitionSpec;
 import org.apache.iceberg.Schema;

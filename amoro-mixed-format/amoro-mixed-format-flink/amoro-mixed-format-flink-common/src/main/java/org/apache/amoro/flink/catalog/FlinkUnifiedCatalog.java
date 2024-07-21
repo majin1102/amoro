@@ -21,13 +21,14 @@ package org.apache.amoro.flink.catalog;
 import static org.apache.amoro.Constants.THRIFT_TABLE_SERVICE_NAME;
 import static org.apache.amoro.flink.table.descriptors.MixedFormatValidator.TABLE_FORMAT;
 
-import org.apache.amoro.AlreadyExistsException;
 import org.apache.amoro.AmoroTable;
 import org.apache.amoro.NoSuchDatabaseException;
 import org.apache.amoro.NoSuchTableException;
 import org.apache.amoro.TableFormat;
-import org.apache.amoro.UnifiedCatalog;
+import org.apache.amoro.TableIdentifier;
+import org.apache.amoro.catalog.UnifiedCatalog;
 import org.apache.amoro.client.AmsThriftUrl;
+import org.apache.amoro.exception.AlreadyExistsException;
 import org.apache.amoro.flink.catalog.factories.CatalogFactoryOptions;
 import org.apache.amoro.flink.catalog.factories.FlinkUnifiedCatalogFactory;
 import org.apache.amoro.flink.catalog.factories.iceberg.IcebergFlinkCatalogFactory;
@@ -36,7 +37,6 @@ import org.apache.amoro.flink.catalog.factories.paimon.PaimonFlinkCatalogFactory
 import org.apache.amoro.flink.table.AmoroDynamicTableFactory;
 import org.apache.amoro.shade.guava32.com.google.common.base.Preconditions;
 import org.apache.amoro.shade.guava32.com.google.common.collect.Maps;
-import org.apache.amoro.table.TableIdentifier;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.table.catalog.AbstractCatalog;
 import org.apache.flink.table.catalog.CatalogBaseTable;

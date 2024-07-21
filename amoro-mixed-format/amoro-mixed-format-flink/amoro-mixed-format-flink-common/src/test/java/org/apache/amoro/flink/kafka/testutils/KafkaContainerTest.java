@@ -20,7 +20,7 @@ package org.apache.amoro.flink.kafka.testutils;
 
 import static org.apache.amoro.flink.kafka.testutils.KafkaConfigGenerate.getProperties;
 import static org.apache.amoro.flink.kafka.testutils.KafkaConfigGenerate.getPropertiesWithByteArray;
-import static org.apache.amoro.table.TableProperties.LOG_STORE_MESSAGE_TOPIC;
+import static org.apache.amoro.properties.TableProperties.LOG_STORE_MESSAGE_TOPIC;
 import static org.apache.kafka.clients.CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG;
 
 import org.apache.kafka.clients.admin.AdminClient;

@@ -333,7 +333,7 @@ import org.apache.amoro.flink.InternalCatalogBuilder;
 import org.apache.amoro.flink.table.MixedFormatTableLoader;
 import org.apache.amoro.flink.util.MixedFormatUtils;
 import org.apache.amoro.flink.write.FlinkSink;
-import org.apache.amoro.table.TableIdentifier;
+import org.apache.amoro.TableIdentifier;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.tuple.Tuple2;

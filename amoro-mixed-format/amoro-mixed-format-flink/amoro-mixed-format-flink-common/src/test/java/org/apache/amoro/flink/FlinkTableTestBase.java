@@ -18,11 +18,11 @@
 
 package org.apache.amoro.flink;
 
+import org.apache.amoro.TableIdentifier;
 import org.apache.amoro.flink.table.MixedFormatTableLoader;
 import org.apache.amoro.flink.write.MixedFormatRowDataTaskWriterFactory;
 import org.apache.amoro.table.KeyedTable;
 import org.apache.amoro.table.MixedTable;
-import org.apache.amoro.table.TableIdentifier;
 import org.apache.amoro.table.UnkeyedTable;
 import org.apache.flink.table.data.RowData;
 import org.apache.flink.table.types.logical.RowType;

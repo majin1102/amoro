@@ -24,11 +24,12 @@ import org.apache.amoro.io.writer.ChangeTaskWriter;
 import org.apache.amoro.io.writer.CommonOutputFileFactory;
 import org.apache.amoro.io.writer.OutputFileFactory;
 import org.apache.amoro.properties.HiveTableProperties;
+import org.apache.amoro.properties.TableProperties;
 import org.apache.amoro.shade.guava32.com.google.common.base.Preconditions;
+import org.apache.amoro.table.IcebergTableProps;
 import org.apache.amoro.table.KeyedTable;
 import org.apache.amoro.table.MixedTable;
 import org.apache.amoro.table.PrimaryKeySpec;
-import org.apache.amoro.table.TableProperties;
 import org.apache.amoro.table.UnkeyedTable;
 import org.apache.amoro.utils.SchemaUtil;
 import org.apache.iceberg.FileFormat;
@@ -72,8 +73,8 @@ public class TaskWriters {
     this.fileSize =
         PropertyUtil.propertyAsLong(
             table.properties(),
-            TableProperties.WRITE_TARGET_FILE_SIZE_BYTES,
-            TableProperties.WRITE_TARGET_FILE_SIZE_BYTES_DEFAULT);
+            IcebergTableProps.WRITE_TARGET_FILE_SIZE_BYTES,
+            IcebergTableProps.WRITE_TARGET_FILE_SIZE_BYTES_DEFAULT);
     this.mask =
         PropertyUtil.propertyAsLong(
                 table.properties(),
@@ -247,8 +248,8 @@ public class TaskWriters {
     long fileSizeBytes =
         PropertyUtil.propertyAsLong(
             table.properties(),
-            TableProperties.WRITE_TARGET_FILE_SIZE_BYTES,
-            TableProperties.WRITE_TARGET_FILE_SIZE_BYTES_DEFAULT);
+            IcebergTableProps.WRITE_TARGET_FILE_SIZE_BYTES,
+            IcebergTableProps.WRITE_TARGET_FILE_SIZE_BYTES_DEFAULT);
     long mask =
         PropertyUtil.propertyAsLong(
                 table.properties(),

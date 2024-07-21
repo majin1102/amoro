@@ -19,6 +19,7 @@
 package org.apache.amoro.hive.utils;
 
 import org.apache.amoro.TableFormat;
+import org.apache.amoro.TableIdentifier;
 import org.apache.amoro.catalog.CatalogTestBase;
 import org.apache.amoro.catalog.CatalogTestHelper;
 import org.apache.amoro.hive.TestHMS;
@@ -29,7 +30,6 @@ import org.apache.amoro.hive.table.UnkeyedHiveTable;
 import org.apache.amoro.properties.HiveTableProperties;
 import org.apache.amoro.shade.guava32.com.google.common.collect.Lists;
 import org.apache.amoro.table.MixedTable;
-import org.apache.amoro.table.TableIdentifier;
 import org.apache.amoro.utils.TablePropertyUtil;
 import org.apache.hadoop.hive.metastore.TableType;
 import org.apache.hadoop.hive.metastore.api.Database;

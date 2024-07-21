@@ -18,6 +18,8 @@
 
 package org.apache.amoro.hive.catalog;
 
+import org.apache.amoro.TableIdentifier;
+import org.apache.amoro.TableMetaStore;
 import org.apache.amoro.api.TableMeta;
 import org.apache.amoro.hive.CachedHiveClientPool;
 import org.apache.amoro.hive.table.KeyedHiveTable;
@@ -30,15 +32,14 @@ import org.apache.amoro.io.AuthenticatedHadoopFileIO;
 import org.apache.amoro.io.TableTrashManagers;
 import org.apache.amoro.properties.HiveTableProperties;
 import org.apache.amoro.properties.MetaTableProperties;
+import org.apache.amoro.properties.TableProperties;
 import org.apache.amoro.shade.guava32.com.google.common.base.Preconditions;
 import org.apache.amoro.shade.guava32.com.google.common.collect.Maps;
 import org.apache.amoro.table.ChangeTable;
+import org.apache.amoro.table.IcebergTableProps;
 import org.apache.amoro.table.KeyedTable;
 import org.apache.amoro.table.MixedTable;
 import org.apache.amoro.table.PrimaryKeySpec;
-import org.apache.amoro.table.TableIdentifier;
-import org.apache.amoro.table.TableMetaStore;
-import org.apache.amoro.table.TableProperties;
 import org.apache.amoro.utils.MixedCatalogUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.hive.metastore.TableType;
@@ -275,8 +276,8 @@ public class MixedHiveTables {
                       FileFormat.valueOf(
                           PropertyUtil.propertyAsString(
                                   metaProperties,
-                                  TableProperties.DEFAULT_FILE_FORMAT,
-                                  TableProperties.DEFAULT_FILE_FORMAT_DEFAULT)
+                                  IcebergTableProps.DEFAULT_FILE_FORMAT,
+                                  IcebergTableProps.DEFAULT_FILE_FORMAT_DEFAULT)
                               .toUpperCase(Locale.ENGLISH))));
               setProToHive(hiveTable, primaryKeySpec, tableMeta);
               client.createTable(hiveTable);

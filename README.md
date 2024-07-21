@@ -95,10 +95,10 @@ Amoro support multiple processing engines for Mixed format as below:
 
 Amoro contains modules as below:
 
-- `amoro-core` contains core abstractions and common implementation for other modules
+- `amoro-iceberg` contains core abstractions and common implementation for other modules
 - `amoro-ams` is amoro management service module
-    - `amoro-ams-api` contains ams thrift api and common interfaces
-    - `amoro-ams-dashboard` is the dashboard frontend for ams
+    - `amoro-api` contains ams thrift api and common interfaces
+    - `amoro-admin` is the dashboard frontend for ams
     - `amoro-ams-server` is the backend server for ams
     - `amoro-ams-optimizer` provides default optimizer implementation
 - `amoro-mixed-format` provides Mixed format implementation

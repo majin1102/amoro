@@ -18,12 +18,13 @@
 
 package org.apache.amoro.hive.utils;
 
-import static org.apache.amoro.table.TableProperties.BASE_FILE_FORMAT;
-import static org.apache.amoro.table.TableProperties.CHANGE_FILE_FORMAT;
-import static org.apache.amoro.table.TableProperties.DEFAULT_FILE_FORMAT;
-import static org.apache.amoro.table.TableProperties.FILE_FORMAT_ORC;
-import static org.apache.amoro.table.TableProperties.FILE_FORMAT_PARQUET;
+import static org.apache.amoro.properties.TableProperties.BASE_FILE_FORMAT;
+import static org.apache.amoro.properties.TableProperties.CHANGE_FILE_FORMAT;
+import static org.apache.amoro.properties.TableProperties.FILE_FORMAT_ORC;
+import static org.apache.amoro.properties.TableProperties.FILE_FORMAT_PARQUET;
+import static org.apache.amoro.table.IcebergTableProps.DEFAULT_FILE_FORMAT;
 
+import org.apache.amoro.TableIdentifier;
 import org.apache.amoro.hive.HMSClientPool;
 import org.apache.amoro.hive.catalog.MixedHiveCatalog;
 import org.apache.amoro.hive.table.SupportHive;
@@ -34,7 +35,6 @@ import org.apache.amoro.properties.HiveTableProperties;
 import org.apache.amoro.shade.guava32.com.google.common.annotations.VisibleForTesting;
 import org.apache.amoro.table.MixedTable;
 import org.apache.amoro.table.PrimaryKeySpec;
-import org.apache.amoro.table.TableIdentifier;
 import org.apache.amoro.utils.TablePropertyUtil;
 import org.apache.hadoop.hive.metastore.api.FieldSchema;
 import org.apache.hadoop.hive.metastore.api.Partition;

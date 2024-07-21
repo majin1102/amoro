@@ -20,6 +20,7 @@ package org.apache.amoro.spark.test.suites.sql;
 
 import org.apache.amoro.TableFormat;
 import org.apache.amoro.data.ChangeAction;
+import org.apache.amoro.properties.TableProperties;
 import org.apache.amoro.shade.guava32.com.google.common.collect.Lists;
 import org.apache.amoro.spark.test.MixedTableTestBase;
 import org.apache.amoro.spark.test.extensions.EnableCatalogSelect;
@@ -30,7 +31,6 @@ import org.apache.amoro.spark.test.utils.TestTableUtil;
 import org.apache.amoro.spark.test.utils.TestTables;
 import org.apache.amoro.table.KeyedTable;
 import org.apache.amoro.table.MetadataColumns;
-import org.apache.amoro.table.TableProperties;
 import org.apache.iceberg.FileFormat;
 import org.apache.iceberg.Schema;
 import org.apache.iceberg.data.Record;

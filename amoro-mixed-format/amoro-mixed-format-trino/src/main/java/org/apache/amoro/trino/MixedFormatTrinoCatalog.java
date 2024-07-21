@@ -35,7 +35,7 @@ import io.trino.spi.security.TrinoPrincipal;
 import org.apache.amoro.mixed.MixedFormatCatalog;
 import org.apache.amoro.shade.guava32.com.google.common.collect.ImmutableList;
 import org.apache.amoro.table.MixedTable;
-import org.apache.amoro.table.TableIdentifier;
+import org.apache.amoro.TableIdentifier;
 import org.apache.iceberg.PartitionSpec;
 import org.apache.iceberg.Schema;
 import org.apache.iceberg.Table;

@@ -18,7 +18,7 @@
 
 package org.apache.amoro.flink.write;
 
-import static org.apache.amoro.table.TableProperties.FILE_FORMAT_ORC;
+import static org.apache.amoro.properties.TableProperties.FILE_FORMAT_ORC;
 
 import org.apache.amoro.TableFormat;
 import org.apache.amoro.TableTestHelper;

@@ -20,6 +20,7 @@ package org.apache.amoro.spark.table;
 
 import org.apache.amoro.hive.table.SupportHive;
 import org.apache.amoro.mixed.MixedFormatCatalog;
+import org.apache.amoro.properties.TableProperties;
 import org.apache.amoro.shade.guava32.com.google.common.collect.ImmutableMap;
 import org.apache.amoro.shade.guava32.com.google.common.collect.ImmutableSet;
 import org.apache.amoro.shade.guava32.com.google.common.collect.Sets;
@@ -27,7 +28,6 @@ import org.apache.amoro.spark.reader.SparkScanBuilder;
 import org.apache.amoro.spark.util.MixedFormatSparkUtils;
 import org.apache.amoro.spark.writer.MixedFormatSparkWriteBuilder;
 import org.apache.amoro.table.MixedTable;
-import org.apache.amoro.table.TableProperties;
 import org.apache.iceberg.Schema;
 import org.apache.iceberg.spark.Spark3Util;
 import org.apache.iceberg.spark.SparkSchemaUtil;

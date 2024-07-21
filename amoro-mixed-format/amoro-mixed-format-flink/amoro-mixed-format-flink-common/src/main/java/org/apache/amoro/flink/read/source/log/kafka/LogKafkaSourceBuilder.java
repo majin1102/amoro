@@ -28,14 +28,14 @@ import static org.apache.amoro.flink.table.descriptors.MixedFormatValidator.SCAN
 import static org.apache.amoro.flink.table.descriptors.MixedFormatValidator.SCAN_STARTUP_TIMESTAMP_MILLIS;
 import static org.apache.amoro.flink.util.CompatibleFlinkPropertyUtil.fetchLogstorePrefixProperties;
 import static org.apache.amoro.flink.util.CompatibleFlinkPropertyUtil.getLogTopic;
-import static org.apache.amoro.table.TableProperties.LOG_STORE_ADDRESS;
-import static org.apache.amoro.table.TableProperties.LOG_STORE_MESSAGE_TOPIC;
+import static org.apache.amoro.properties.TableProperties.LOG_STORE_ADDRESS;
+import static org.apache.amoro.properties.TableProperties.LOG_STORE_MESSAGE_TOPIC;
 import static org.apache.flink.util.Preconditions.checkNotNull;
 import static org.apache.kafka.clients.CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG;
 
 import org.apache.amoro.flink.table.descriptors.MixedFormatValidator;
-import org.apache.amoro.table.TableProperties;
-import org.apache.amoro.utils.CompatiblePropertyUtil;
+import org.apache.amoro.properties.CompatiblePropertyUtil;
+import org.apache.amoro.properties.TableProperties;
 import org.apache.flink.api.connector.source.Boundedness;
 import org.apache.flink.connector.kafka.source.KafkaSource;
 import org.apache.flink.connector.kafka.source.KafkaSourceBuilder;

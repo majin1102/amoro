@@ -21,16 +21,16 @@ package org.apache.amoro.hive.catalog;
 import static org.apache.iceberg.CatalogUtil.ICEBERG_CATALOG_TYPE;
 import static org.apache.iceberg.CatalogUtil.ICEBERG_CATALOG_TYPE_HIVE;
 
-import org.apache.amoro.CommonUnifiedCatalog;
 import org.apache.amoro.TableFormat;
-import org.apache.amoro.UnifiedCatalog;
 import org.apache.amoro.api.CatalogMeta;
 import org.apache.amoro.catalog.CatalogTestHelper;
 import org.apache.amoro.catalog.CatalogTestHelpers;
+import org.apache.amoro.catalog.CommonUnifiedCatalog;
 import org.apache.amoro.catalog.MixedTables;
+import org.apache.amoro.catalog.UnifiedCatalog;
+import org.apache.amoro.catalog.UnifiedCatalogUtil;
 import org.apache.amoro.properties.CatalogMetaProperties;
 import org.apache.amoro.shade.guava32.com.google.common.collect.Maps;
-import org.apache.amoro.utils.MixedCatalogUtil;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.iceberg.CatalogProperties;
@@ -94,7 +94,7 @@ public class HiveCatalogTestHelper implements CatalogTestHelper {
           "Cannot build mixed-tables for table format:" + tableFormat);
     }
     return new MixedTables(
-        catalogMeta.getCatalogProperties(), MixedCatalogUtil.buildMetaStore(catalogMeta));
+        catalogMeta.getCatalogProperties(), UnifiedCatalogUtil.buildMetaStore(catalogMeta));
   }
 
   @Override

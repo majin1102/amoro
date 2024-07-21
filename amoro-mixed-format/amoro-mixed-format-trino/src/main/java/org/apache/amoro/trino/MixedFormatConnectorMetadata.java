@@ -53,7 +53,7 @@ import org.apache.amoro.mixed.MixedFormatCatalog;
 import org.apache.amoro.shade.guava32.com.google.common.collect.ImmutableList;
 import org.apache.amoro.shade.guava32.com.google.common.collect.Iterators;
 import org.apache.amoro.table.MixedTable;
-import org.apache.amoro.table.TableIdentifier;
+import org.apache.amoro.TableIdentifier;
 import org.apache.amoro.trino.keyed.KeyedConnectorMetadata;
 import org.apache.amoro.trino.keyed.KeyedTableHandle;
 import org.apache.amoro.trino.unkeyed.IcebergMetadata;

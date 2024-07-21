@@ -23,10 +23,10 @@ import static org.apache.amoro.properties.HiveTableProperties.MIXED_TABLE_ROOT_L
 
 import org.apache.amoro.BasicTableTestHelper;
 import org.apache.amoro.TableFormat;
+import org.apache.amoro.TableIdentifier;
 import org.apache.amoro.catalog.TestMixedCatalog;
 import org.apache.amoro.hive.TestHMS;
 import org.apache.amoro.table.MixedTable;
-import org.apache.amoro.table.TableIdentifier;
 import org.apache.iceberg.PartitionSpec;
 import org.apache.iceberg.Table;
 import org.apache.thrift.TException;

@@ -20,12 +20,13 @@ package org.apache.amoro.flink.table;
 
 import static org.apache.amoro.MockAmoroManagementServer.TEST_CATALOG_NAME;
 import static org.apache.amoro.flink.kafka.testutils.KafkaContainerTest.KAFKA_CONTAINER;
-import static org.apache.amoro.table.TableProperties.ENABLE_LOG_STORE;
-import static org.apache.amoro.table.TableProperties.LOG_STORE_ADDRESS;
-import static org.apache.amoro.table.TableProperties.LOG_STORE_MESSAGE_TOPIC;
+import static org.apache.amoro.properties.TableProperties.ENABLE_LOG_STORE;
+import static org.apache.amoro.properties.TableProperties.LOG_STORE_ADDRESS;
+import static org.apache.amoro.properties.TableProperties.LOG_STORE_MESSAGE_TOPIC;
 
 import org.apache.amoro.BasicTableTestHelper;
 import org.apache.amoro.TableFormat;
+import org.apache.amoro.TableIdentifier;
 import org.apache.amoro.TableTestHelper;
 import org.apache.amoro.catalog.BasicCatalogTestHelper;
 import org.apache.amoro.catalog.CatalogTestHelper;
@@ -38,7 +39,6 @@ import org.apache.amoro.hive.catalog.HiveCatalogTestHelper;
 import org.apache.amoro.hive.catalog.HiveTableTestHelper;
 import org.apache.amoro.mixed.MixedFormatCatalog;
 import org.apache.amoro.table.MixedTable;
-import org.apache.amoro.table.TableIdentifier;
 import org.apache.flink.table.api.ApiExpression;
 import org.apache.flink.table.api.DataTypes;
 import org.apache.flink.table.api.Table;

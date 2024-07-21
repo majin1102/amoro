@@ -28,7 +28,7 @@ under the License.
 
     <!-- Limited by the Javalin framework, it is not possible to use shade classes. -->
     <suppress
-            files="org[/\\]apache[/\\]amoro[/\\]server[/\\]RestCatalogService\.java"
+            files="org[/\\]apache[/\\]amoro[/\\]scheduler[/\\]RestCatalogService\.java"
             checks="Regexp"/>
 
     <suppress

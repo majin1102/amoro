@@ -27,10 +27,10 @@ import static org.apache.amoro.flink.table.descriptors.MixedFormatValidator.MIXE
 import static org.apache.amoro.flink.table.descriptors.MixedFormatValidator.MIXED_FORMAT_WRITE_MAX_OPEN_FILE_SIZE;
 import static org.apache.amoro.flink.table.descriptors.MixedFormatValidator.MIXED_FORMAT_WRITE_MAX_OPEN_FILE_SIZE_DEFAULT;
 import static org.apache.amoro.flink.table.descriptors.MixedFormatValidator.SUBMIT_EMPTY_SNAPSHOTS;
-import static org.apache.amoro.table.TableProperties.WRITE_DISTRIBUTION_HASH_MODE;
-import static org.apache.amoro.table.TableProperties.WRITE_DISTRIBUTION_HASH_MODE_DEFAULT;
-import static org.apache.amoro.table.TableProperties.WRITE_DISTRIBUTION_MODE;
-import static org.apache.amoro.table.TableProperties.WRITE_DISTRIBUTION_MODE_DEFAULT;
+import static org.apache.amoro.properties.TableProperties.WRITE_DISTRIBUTION_HASH_MODE;
+import static org.apache.amoro.properties.TableProperties.WRITE_DISTRIBUTION_HASH_MODE_DEFAULT;
+import static org.apache.amoro.table.IcebergTableProps.WRITE_DISTRIBUTION_MODE;
+import static org.apache.amoro.table.IcebergTableProps.WRITE_DISTRIBUTION_MODE_DEFAULT;
 import static org.apache.flink.table.factories.FactoryUtil.SINK_PARALLELISM;
 
 import org.apache.amoro.flink.metric.MetricsGenerator;
@@ -44,9 +44,9 @@ import org.apache.amoro.flink.util.CompatibleFlinkPropertyUtil;
 import org.apache.amoro.flink.util.IcebergClassUtil;
 import org.apache.amoro.flink.util.MixedFormatUtils;
 import org.apache.amoro.flink.util.ProxyUtil;
+import org.apache.amoro.properties.TableProperties;
 import org.apache.amoro.table.DistributionHashMode;
 import org.apache.amoro.table.MixedTable;
-import org.apache.amoro.table.TableProperties;
 import org.apache.flink.api.common.typeinfo.Types;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
 import org.apache.flink.configuration.Configuration;

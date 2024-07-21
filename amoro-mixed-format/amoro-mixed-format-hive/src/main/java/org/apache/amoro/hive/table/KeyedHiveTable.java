@@ -19,6 +19,7 @@
 package org.apache.amoro.hive.table;
 
 import org.apache.amoro.TableFormat;
+import org.apache.amoro.TableIdentifier;
 import org.apache.amoro.api.TableMeta;
 import org.apache.amoro.hive.HMSClientPool;
 import org.apache.amoro.hive.op.BaseSchemaUpdate;
@@ -33,7 +34,6 @@ import org.apache.amoro.table.BasicUnkeyedTable;
 import org.apache.amoro.table.ChangeTable;
 import org.apache.amoro.table.KeyedTable;
 import org.apache.amoro.table.PrimaryKeySpec;
-import org.apache.amoro.table.TableIdentifier;
 import org.apache.iceberg.MixedChangeTableScan;
 import org.apache.iceberg.Table;
 import org.apache.iceberg.UpdateSchema;

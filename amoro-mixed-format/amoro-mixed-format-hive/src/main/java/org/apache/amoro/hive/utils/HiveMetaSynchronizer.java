@@ -18,6 +18,7 @@
 
 package org.apache.amoro.hive.utils;
 
+import org.apache.amoro.TableIdentifier;
 import org.apache.amoro.hive.HMSClientPool;
 import org.apache.amoro.hive.op.OverwriteHiveFiles;
 import org.apache.amoro.hive.table.SupportHive;
@@ -26,9 +27,8 @@ import org.apache.amoro.properties.HiveTableProperties;
 import org.apache.amoro.shade.guava32.com.google.common.annotations.VisibleForTesting;
 import org.apache.amoro.shade.guava32.com.google.common.collect.Lists;
 import org.apache.amoro.shade.guava32.com.google.common.collect.Maps;
+import org.apache.amoro.table.IcebergTableProps;
 import org.apache.amoro.table.MixedTable;
-import org.apache.amoro.table.TableIdentifier;
-import org.apache.amoro.table.TableProperties;
 import org.apache.amoro.table.UnkeyedTable;
 import org.apache.amoro.utils.TablePropertyUtil;
 import org.apache.commons.collections.CollectionUtils;
@@ -608,8 +608,8 @@ public class HiveMetaSynchronizer {
                     mixedTable
                         .properties()
                         .getOrDefault(
-                            TableProperties.DEFAULT_FILE_FORMAT,
-                            TableProperties.DEFAULT_FILE_FORMAT_DEFAULT),
+                            IcebergTableProps.DEFAULT_FILE_FORMAT,
+                            IcebergTableProps.DEFAULT_FILE_FORMAT_DEFAULT),
                     mixedTable.spec(),
                     mixedTable.io().getConf(),
                     MetricsConfig.fromProperties(mixedTable.properties()),

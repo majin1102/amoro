@@ -18,7 +18,7 @@
 
 package org.apache.amoro.hive.catalog;
 
-import static org.apache.amoro.table.TableProperties.DEFAULT_FILE_FORMAT_DEFAULT;
+import static org.apache.amoro.table.IcebergTableProps.DEFAULT_FILE_FORMAT_DEFAULT;
 
 import org.apache.amoro.BasicTableTestHelper;
 import org.apache.amoro.data.ChangeAction;

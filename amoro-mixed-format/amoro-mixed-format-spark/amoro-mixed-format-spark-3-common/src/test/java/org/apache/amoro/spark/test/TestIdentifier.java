@@ -18,7 +18,7 @@
 
 package org.apache.amoro.spark.test;
 
-import org.apache.amoro.table.TableIdentifier;
+import org.apache.amoro.TableIdentifier;
 
 public class TestIdentifier {
   public static final String SOURCE_TYPE_HIVE = "hive";

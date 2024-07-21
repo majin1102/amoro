@@ -19,7 +19,7 @@
 package org.apache.amoro.trino;
 
 import org.apache.amoro.mixed.MixedFormatCatalog;
-import org.apache.amoro.table.TableMetaStore;
+import org.apache.amoro.TableMetaStore;
 
 /** Interface of factory to generate {@link MixedFormatCatalog} */
 public interface MixedFormatCatalogFactory {

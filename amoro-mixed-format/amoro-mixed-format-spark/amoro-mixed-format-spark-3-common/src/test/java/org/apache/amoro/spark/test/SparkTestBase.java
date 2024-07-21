@@ -18,12 +18,12 @@
 
 package org.apache.amoro.spark.test;
 
-import org.apache.amoro.AlreadyExistsException;
 import org.apache.amoro.Constants;
 import org.apache.amoro.TableFormat;
-import org.apache.amoro.UnifiedCatalog;
-import org.apache.amoro.UnifiedCatalogLoader;
+import org.apache.amoro.catalog.UnifiedCatalog;
+import org.apache.amoro.catalog.UnifiedCatalogLoader;
 import org.apache.amoro.client.AmsThriftUrl;
+import org.apache.amoro.exception.AlreadyExistsException;
 import org.apache.amoro.properties.HiveTableProperties;
 import org.apache.amoro.shade.guava32.com.google.common.base.Preconditions;
 import org.apache.amoro.shade.guava32.com.google.common.collect.ImmutableMap;

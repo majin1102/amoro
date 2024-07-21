@@ -20,9 +20,9 @@ package org.apache.amoro.hive.op;
 
 import org.apache.amoro.hive.HMSClientPool;
 import org.apache.amoro.hive.utils.HiveTableUtil;
+import org.apache.amoro.table.IcebergTableProps;
 import org.apache.amoro.table.KeyedTable;
 import org.apache.amoro.table.MixedTable;
-import org.apache.amoro.table.TableProperties;
 import org.apache.hadoop.hive.metastore.api.Table;
 import org.apache.iceberg.FileFormat;
 import org.apache.iceberg.Schema;
@@ -71,8 +71,8 @@ public class HiveSchemaUpdate extends BaseSchemaUpdate {
             FileFormat.valueOf(
                 PropertyUtil.propertyAsString(
                         mixedTable.properties(),
-                        TableProperties.DEFAULT_FILE_FORMAT,
-                        TableProperties.DEFAULT_FILE_FORMAT_DEFAULT)
+                        IcebergTableProps.DEFAULT_FILE_FORMAT,
+                        IcebergTableProps.DEFAULT_FILE_FORMAT_DEFAULT)
                     .toUpperCase(Locale.ENGLISH))));
     HiveTableUtil.persistTable(transactionClient, tbl);
   }

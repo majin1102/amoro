@@ -18,12 +18,12 @@
 
 package org.apache.amoro.hive.op;
 
+import org.apache.amoro.TableIdentifier;
 import org.apache.amoro.hive.utils.HivePartitionUtil;
 import org.apache.amoro.properties.HiveTableProperties;
 import org.apache.amoro.shade.guava32.com.google.common.collect.Lists;
 import org.apache.amoro.shade.guava32.com.google.common.collect.Streams;
 import org.apache.amoro.table.MixedTable;
-import org.apache.amoro.table.TableIdentifier;
 import org.apache.amoro.table.UnkeyedTable;
 import org.apache.amoro.utils.MixedTableUtil;
 import org.apache.amoro.utils.TableFileUtil;

@@ -18,11 +18,11 @@
 
 package org.apache.amoro.flink.table;
 
-import static org.apache.amoro.table.TableProperties.ENABLE_LOG_STORE;
-import static org.apache.amoro.table.TableProperties.LOG_STORE_ADDRESS;
-import static org.apache.amoro.table.TableProperties.LOG_STORE_MESSAGE_TOPIC;
-import static org.apache.amoro.table.TableProperties.LOG_STORE_STORAGE_TYPE_KAFKA;
-import static org.apache.amoro.table.TableProperties.LOG_STORE_TYPE;
+import static org.apache.amoro.properties.TableProperties.ENABLE_LOG_STORE;
+import static org.apache.amoro.properties.TableProperties.LOG_STORE_ADDRESS;
+import static org.apache.amoro.properties.TableProperties.LOG_STORE_MESSAGE_TOPIC;
+import static org.apache.amoro.properties.TableProperties.LOG_STORE_STORAGE_TYPE_KAFKA;
+import static org.apache.amoro.properties.TableProperties.LOG_STORE_TYPE;
 import static org.apache.flink.table.api.Expressions.$;
 
 import org.apache.amoro.BasicTableTestHelper;
@@ -37,7 +37,7 @@ import org.apache.amoro.flink.util.TestUtil;
 import org.apache.amoro.hive.TestHMS;
 import org.apache.amoro.hive.catalog.HiveCatalogTestHelper;
 import org.apache.amoro.hive.catalog.HiveTableTestHelper;
-import org.apache.amoro.table.TableProperties;
+import org.apache.amoro.properties.TableProperties;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.table.api.ApiExpression;
