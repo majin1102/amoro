@@ -173,23 +173,29 @@ public class MixedAndIcebergAdmin extends PersistentBase implements TableFormatA
   }
 
   private long getRecordsOfTable(MixedTable mixedTable) {
-    long totalRecords;
+    long totalRecords = 0L;
     if (mixedTable.isKeyedTable()) {
       Snapshot changeSnapshot =
           SnapshotUtil.latestSnapshot(mixedTable.asKeyedTable().changeTable(), null);
       Snapshot baseSnapshot =
           SnapshotUtil.latestSnapshot(mixedTable.asKeyedTable().baseTable(), null);
-      totalRecords =
-          PropertyUtil.propertyAsLong(
-                  changeSnapshot.summary(), SnapshotSummary.TOTAL_RECORDS_PROP, 0L)
-              + PropertyUtil.propertyAsLong(
-                  baseSnapshot.summary(), SnapshotSummary.TOTAL_RECORDS_PROP, 0L);
+      if (changeSnapshot != null) {
+        totalRecords +=
+            org.apache.iceberg.util.PropertyUtil.propertyAsLong(
+                changeSnapshot.summary(), SnapshotSummary.TOTAL_RECORDS_PROP, 0L);
+      }
+      if (baseSnapshot != null) {
+        totalRecords +=
+            org.apache.iceberg.util.PropertyUtil.propertyAsLong(
+                baseSnapshot.summary(), SnapshotSummary.TOTAL_RECORDS_PROP, 0L);
+      }
     } else {
-      totalRecords =
-          PropertyUtil.propertyAsLong(
-              SnapshotUtil.latestSnapshot(mixedTable.asUnkeyedTable(), null).summary(),
-              SnapshotSummary.TOTAL_RECORDS_PROP,
-              0L);
+      Snapshot latestSnapshot = SnapshotUtil.latestSnapshot(mixedTable.asUnkeyedTable(), null);
+      if (latestSnapshot != null) {
+        totalRecords =
+            org.apache.iceberg.util.PropertyUtil.propertyAsLong(
+                latestSnapshot.summary(), SnapshotSummary.TOTAL_RECORDS_PROP, 0L);
+      }
     }
     return totalRecords;
   }

@@ -82,7 +82,7 @@ CREATE TABLE `table_identifier`
     `format`          VARCHAR(32)  NOT NULL COMMENT 'Table Format',
     PRIMARY KEY (`table_id`),
     UNIQUE KEY `table_name_index` (`catalog_name`,`db_name`,`table_name`)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT 'Table identifier for AMS' ROW_FORMAT=DYNAMIC;
 
 CREATE TABLE `table_metadata`
 (
@@ -131,7 +131,7 @@ CREATE TABLE `table_runtime`
     `pending_input`                 mediumtext,
     PRIMARY KEY (`table_id`),
     UNIQUE KEY `table_index` (`catalog_name`,`db_name`,`table_name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT 'Optimize running information of each table';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT 'Optimize running information of each table' ROW_FORMAT=DYNAMIC;
 
 CREATE TABLE `table_optimizing_process`
 (
@@ -202,23 +202,23 @@ CREATE TABLE `api_tokens`
 ) ENGINE=InnoDB AUTO_INCREMENT=33 DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='Openapi  secret';
 
 CREATE TABLE `platform_file` (
-  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'file id',
-  `file_name` varchar(100) NOT NULL COMMENT 'file name',
-  `file_content_b64` mediumtext NOT NULL COMMENT 'file content encoded with base64',
-  `file_path` varchar(100) DEFAULT NULL COMMENT 'may be hdfs path , not be used now',
-  `add_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'add timestamp',
-  PRIMARY KEY (`id`)
+                                 `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'file id',
+                                 `file_name` varchar(100) NOT NULL COMMENT 'file name',
+                                 `file_content_b64` mediumtext NOT NULL COMMENT 'file content encoded with base64',
+                                 `file_path` varchar(100) DEFAULT NULL COMMENT 'may be hdfs path , not be used now',
+                                 `add_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'add timestamp',
+                                 PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COMMENT='store files info saved in the platform';
 
 CREATE TABLE `table_blocker` (
-  `blocker_id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'Blocker unique id',
-  `catalog_name` varchar(64) NOT NULL COMMENT 'Catalog name',
-  `db_name` varchar(128) NOT NULL COMMENT 'Database name',
-  `table_name` varchar(256) NOT NULL COMMENT 'Table name',
-  `operations` varchar(128) NOT NULL COMMENT 'Blocked operations',
-  `create_time` timestamp NULL DEFAULT NULL COMMENT 'Blocker create time',
-  `expiration_time` timestamp NULL DEFAULT NULL COMMENT 'Blocker expiration time',
-  `properties` mediumtext COMMENT 'Blocker properties',
-  PRIMARY KEY (`blocker_id`),
-  KEY `table_index` (`catalog_name`,`db_name`,`table_name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Table blockers';
+                                 `blocker_id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'Blocker unique id',
+                                 `catalog_name` varchar(64) NOT NULL COMMENT 'Catalog name',
+                                 `db_name` varchar(128) NOT NULL COMMENT 'Database name',
+                                 `table_name` varchar(256) NOT NULL COMMENT 'Table name',
+                                 `operations` varchar(128) NOT NULL COMMENT 'Blocked operations',
+                                 `create_time` timestamp NULL DEFAULT NULL COMMENT 'Blocker create time',
+                                 `expiration_time` timestamp NULL DEFAULT NULL COMMENT 'Blocker expiration time',
+                                 `properties` mediumtext COMMENT 'Blocker properties',
+                                 PRIMARY KEY (`blocker_id`),
+                                 KEY `table_index` (`catalog_name`,`db_name`,`table_name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Table blockers' ROW_FORMAT=DYNAMIC;
