@@ -44,6 +44,7 @@ public class TableOptimizingInfo {
   private long fileCount = 0;
   private long fileSize = 0;
   private double quota = 0.0;
+  private String resource = "4c 4g";
   private double quotaOccupation = 0.0;
 
   private String groupName = TableProperties.SELF_OPTIMIZING_GROUP_DEFAULT;
@@ -116,6 +117,14 @@ public class TableOptimizingInfo {
     this.groupName = groupName;
   }
 
+  public String getResource() {
+    return resource;
+  }
+
+  public void setResource(String resource) {
+    this.resource = resource;
+  }
+
   @Override
   public String toString() {
     return MoreObjects.toStringHelper(this)
@@ -126,6 +135,7 @@ public class TableOptimizingInfo {
         .add("fileCount", fileCount)
         .add("fileSize", fileSize)
         .add("quota", quota)
+        .add("resource", resource)
         .add("quotaOccupation", quotaOccupation)
         .add("groupName", groupName)
         .toString();

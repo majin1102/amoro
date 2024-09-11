@@ -20,6 +20,7 @@ package org.apache.amoro.server.dashboard.controller;
 
 import io.javalin.http.Context;
 import org.apache.amoro.ServerTableIdentifier;
+import org.apache.amoro.TableFormat;
 import org.apache.amoro.resource.Resource;
 import org.apache.amoro.resource.ResourceGroup;
 import org.apache.amoro.resource.ResourceType;
@@ -67,37 +68,41 @@ public class OptimizerController {
     Integer pageSize = ctx.queryParamAsClass("pageSize", Integer.class).getOrDefault(20);
     int offset = (page - 1) * pageSize;
 
-    List<TableRuntime> tableRuntimes = new ArrayList<>();
-    List<ServerTableIdentifier> tables = tableService.listManagedTables();
-    for (ServerTableIdentifier identifier : tables) {
-      TableRuntime tableRuntime = tableService.getRuntime(identifier);
-      if (tableRuntime == null) {
-        continue;
-      }
-      if ((ALL_GROUP.equals(optimizerGroup)
-              || tableRuntime.getOptimizerGroup().equals(optimizerGroup))
-          && (StringUtils.isEmpty(dbFilterStr)
-              || StringUtils.containsIgnoreCase(identifier.getDatabase(), dbFilterStr))
-          && (StringUtils.isEmpty(tableFilterStr)
-              || StringUtils.containsIgnoreCase(identifier.getTableName(), tableFilterStr))) {
-        tableRuntimes.add(tableRuntime);
-      }
-    }
-    tableRuntimes.sort(
-        (o1, o2) -> {
-          // first we compare the status , and then we compare the start time when status are equal;
-          int statDiff = o1.getOptimizingStatus().compareTo(o2.getOptimizingStatus());
-          // status order is asc, startTime order is desc
-          if (statDiff == 0) {
-            long timeDiff = o1.getCurrentStatusStartTime() - o2.getCurrentStatusStartTime();
-            return timeDiff >= 0 ? (timeDiff == 0 ? 0 : -1) : 1;
-          } else {
-            return statDiff;
-          }
-        });
     PageResult<TableOptimizingInfo> amsPageResult =
-        PageResult.of(tableRuntimes, offset, pageSize, OptimizingUtil::buildTableOptimizeInfo);
+        //        PageResult.of(
+        //            optimizingAdmin.getOptimizingProcessInfos(
+        //                optimizerGroup, page, offset, new TableFilter(dbFilterStr,
+        // tableFilterStr)),
+        //            page);
+        PageResult.of(generateMockData(), page);
+    String sorter = ctx.queryParam("sortField");
+    String order = ctx.queryParam("sortOrder");
+    if (sorter != null) {
+      System.out.println("##########shitttttt!!!!!!!!:::::: " + sorter);
+      System.out.println("##########shitttttt!!!!!!!!:::::: " + order);
+    }
     ctx.json(OkResponse.of(amsPageResult));
+  }
+
+  // 生成mock数据的方法
+  public static List<TableOptimizingInfo> generateMockData() {
+    List<TableOptimizingInfo> mockDataList = new ArrayList<>();
+
+    for (int i = 1; i <= 5; i++) {
+      TableOptimizingInfo info =
+          new TableOptimizingInfo(
+              ServerTableIdentifier.of("default", "db", "table" + i, TableFormat.ICEBERG));
+      info.setOptimizeStatus("optimizing");
+      info.setDuration(1000L * i);
+      info.setFileCount(100L + i);
+      info.setFileSize(1024L * i);
+      info.setQuota(10.0 * i);
+      info.setQuotaOccupation(0.5 * i);
+      info.setGroupName("group" + (i % 3 + 1));
+      mockDataList.add(info);
+    }
+
+    return mockDataList;
   }
 
   /** get optimizers. */
