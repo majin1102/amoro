@@ -29,10 +29,12 @@ export function getOptimizerTableList(
     tableSearchInput: string
     page: number
     pageSize: number
+    sortField:String
+    sortOrder:String
   },
 ) {
-  const { optimizerGroup, dbSearchInput, tableSearchInput, page, pageSize } = params
-  return request.get(`ams/v1/optimize/optimizerGroups/${optimizerGroup}/tables`, { params: { dbSearchInput, tableSearchInput, page, pageSize } })
+  const { optimizerGroup, dbSearchInput, tableSearchInput, page, pageSize, sortField, sortOrder  } = params
+  return request.get(`ams/v1/optimize/optimizerGroups/${optimizerGroup}/tables`, { params: { dbSearchInput, tableSearchInput, page, pageSize, sortField, sortOrder } })
 }
 
 export function getOptimizerResourceList(

@@ -59,8 +59,6 @@ export interface IKeyAndValue {
   value: string
 }
 export interface IBaseDetailInfo {
-  optimizingStatus: string
-  records: string
   tableType: string
   tableName: string
   createTime: string
@@ -69,7 +67,6 @@ export interface IBaseDetailInfo {
   averageFile: string
   tableFormat: string
   hasPartition: boolean
-  healthScore: number
 }
 
 export interface DetailColumnItem {
@@ -245,7 +242,6 @@ export interface IOptimizeTableItem {
   quotaOccupationDesc: string
   duration: number
   durationDesc: string
-  durationDisplay: string
   fileSizeDesc: string
   tableIdentifier: ITableIdentifier
   tableNameOnly?: string
@@ -255,12 +251,16 @@ export interface IIOptimizeGroupItem {
   resourceGroup: {
     name: string
     container: string
+    rule: string
+    weight: number
     properties: { [prop: string]: string }
   }
   occupationCore: number
   occupationMemory: number
   name: string
   container: string
+  rule: string
+  weight: number
   resourceOccupation: string
 }
 
@@ -356,7 +356,6 @@ export enum tableTypeIconMap {
   ARCTIC = 'amoro',
   HIVE = 'hive',
   PAIMON = 'paimon',
-  HUDI = 'hudi',
 }
 
 export type ILineChartOriginalData = Record<string, Record<string, number>>
@@ -364,14 +363,12 @@ export type ILineChartOriginalData = Record<string, Record<string, number>>
 export enum branchTypeMap {
   BRANCH = 'branch',
   TAG = 'tag',
-  CONSUMER = 'consumer',
 }
 
 export interface IBranchItem {
   value: string
   label: string
   type: branchTypeMap
-  amoroCurrentSnapshotsOfTable?: SnapshotItem
 }
 
 export interface IServiceBranchItem {
@@ -381,8 +378,6 @@ export interface IServiceBranchItem {
   maxSnapshotAgeMs: number | null
   maxRefAgeMs: number | null
   type: branchTypeMap
-  consumerId: string
-  amoroCurrentSnapshotsOfTable: SnapshotItem
 }
 
 export enum operationMap {

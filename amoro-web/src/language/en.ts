@@ -17,7 +17,6 @@
   */
 
 export default {
-  healthScore: 'Health Score',
   overview: 'Overview',
   catalogs: 'Catalogs',
   catalog: 'Catalog',
@@ -106,6 +105,8 @@ export default {
   retry: 'Retry',
   costTime: 'Cost Time',
   thread: 'Thread',
+  rule: 'Rules',
+  weight: 'Weight',
   resourceOccupation: 'Resource Occupation',
   core: 'Core',
   scaleOut: 'Scale-Out',
@@ -199,9 +200,8 @@ export default {
   totalDeleteFiles: 'delete-files',
   branches: 'branches',
   tags: 'tags',
-  consumers: 'consumers',
   nothingToShow: 'Nothing to show',
-  filterBranchesOrTagsOrConsumers: 'Filter branches/tags/consumers',
+  filterBranchesOrTags: 'Filter branches/tags',
   findATag: 'Find a tag',
   fileSearchPlaceholder: 'Filter partitions',
   noResourceGroupsTitle: 'No resource groups available.',

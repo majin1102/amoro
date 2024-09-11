@@ -44,9 +44,7 @@ export default defineComponent({
     const detailRef = ref()
 
     const tabConfigs = shallowReactive([
-      { key: 'Snapshots', label: 'snapshots' },
       { key: 'Optimizing', label: 'optimizing' },
-      { key: 'Operations', label: 'operations' },
     ])
 
     const state = reactive({
@@ -54,13 +52,11 @@ export default defineComponent({
       isSecondaryNav: false,
       baseInfo: {
         optimizingStatus: '',
-        records: '',
         tableType: '',
         tableName: '',
         createTime: '',
         tableFormat: '',
         hasPartition: false,
-        healthScore: -1,
       } as IBaseDetailInfo,
       detailLoaded: false,
     })
@@ -145,17 +141,11 @@ export default defineComponent({
           <div class="table-info g-flex-ac">
             <p>{{ $t('optimizingStatus') }}: <span class="text-color">{{ baseInfo.optimizingStatus }}</span></p>
             <a-divider type="vertical" />
-            <p>{{ $t('records') }}: <span class="text-color">{{ baseInfo.records }}</span></p>
-            <a-divider type="vertical" />
             <template v-if="!isIceberg">
               <p>{{ $t('createTime') }}: <span class="text-color">{{ baseInfo.createTime }}</span></p>
               <a-divider type="vertical" />
             </template>
             <p>{{ $t('tableFormat') }}: <span class="text-color">{{ baseInfo.tableFormat }}</span></p>
-            <a-divider type="vertical" />
-            <p>
-              {{ $t('healthScore') }}: <span class="text-color">{{ baseInfo.healthScore == null || baseInfo.healthScore < 0 ? 'N/A' : baseInfo.healthScore }}</span>
-            </p>
           </div>
         </div>
       </div>
@@ -163,9 +153,6 @@ export default defineComponent({
         <a-tabs v-model:activeKey="activeKey" destroy-inactive-tab-pane @change="onChangeTab">
           <a-tab-pane key="Details" :tab="$t('details')" force-render>
             <UDetails ref="detailRef" @set-base-detail-info="setBaseDetailInfo" />
-          </a-tab-pane>
-          <a-tab-pane v-if="detailLoaded" key="Files" :tab="$t('files')">
-            <UFiles :has-partition="baseInfo.hasPartition" />
           </a-tab-pane>
           <a-tab-pane v-for="tab in tabConfigs" :key="tab.key" :tab="$t(tab.label)">
             <component :is="`U${tab.key}`" />
@@ -184,11 +171,9 @@ export default defineComponent({
   border: 1px solid #e8e8f0;
   padding: 12px 0;
   min-height: 100%;
-
   .create-time {
     margin-top: 12px;
   }
-
   .tables-menu-wrap {
     position: fixed;
     width: 100%;
@@ -197,28 +182,23 @@ export default defineComponent({
     left: 200px;
     z-index: 100;
   }
-
   .table-name {
     font-size: 24px;
     line-height: 1.5;
     margin-right: 16px;
-    max-width: 100%;
+    max-width: 600px;
     padding-left: 24px;
   }
-
   .table-info {
     padding: 12px 24px 0 24px;
-
     .text-color {
       color: #7CB305;
     }
   }
-
   .table-edit {
     font-size: 18px;
     padding-right: 12px;
   }
-
   :deep(.ant-tabs-nav) {
     padding-left: 12px;
     margin-bottom: 0;

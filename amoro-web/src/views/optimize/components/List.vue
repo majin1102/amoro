@@ -51,7 +51,7 @@ const columns = shallowReactive([
   { dataIndex: 'durationDisplay', title: t('duration'), width: '10%', ellipsis: true },
   { dataIndex: 'fileCount', title: t('fileCount'), width: '10%', ellipsis: true },
   { dataIndex: 'fileSizeDesc', title: t('fileSize'), width: '10%', ellipsis: true },
-  { dataIndex: 'quota', title: t('quota'), width: '10%', ellipsis: true },
+  { dataIndex: 'resource', title: t('resource'), width: '10%', ellipsis: true, sorter: true },
   { dataIndex: 'quotaOccupationDesc', title: t('occupation'), width: 120, ellipsis: true },
 ])
 
@@ -59,8 +59,10 @@ const pagination = reactive(usePagination())
 const dataSource = reactive<IOptimizeTableItem[]>([])
 const optimizerGroup = ref<ILableAndValue>()
 const dbSearchInput = ref<ILableAndValue>()
+const instantSearchInput = ref<ILableAndValue>()
 const tableSearchInput = ref<ILableAndValue>()
 const placeholder = reactive(usePlaceholder())
+const sort = reactive({ field: '', order: '' });
 
 async function getOptimizerGroupList() {
   const res = await getResourceGroupsListAPI()
@@ -85,14 +87,16 @@ async function getTableList() {
       tableSearchInput: tableSearchInput.value || '',
       page: pagination.current,
       pageSize: pagination.pageSize,
+      sortField: sort.field,
+      sortOrder: sort.order
     }
     const result = await getOptimizerTableList(params as any)
     const { list, total } = result
     pagination.total = total;
     (list || []).forEach((p: IOptimizeTableItem) => {
       p.quotaOccupationDesc = p.quotaOccupation - 0.0005 > 0 ? `${(p.quotaOccupation * 100).toFixed(1)}%` : '0'
-      p.durationDesc = p.duration ? formatMS2Time(p.duration) : '-'
-      p.durationDisplay = formatMS2DisplayTime(p.duration || 0)
+      p.durationDesc = formatMS2Time(p.duration || 0) as string
+      (p as any).durationDisplay = formatMS2DisplayTime(p.duration || 0)
       p.fileSizeDesc = bytesToSize(p.fileSize)
       dataSource.push(p)
     })
@@ -128,11 +132,21 @@ async function releaseJob(record: IOptimizeResourceTableItem) {
     releaseLoading.value = false
   }
 }
-function changeTable({ current = pagination.current, pageSize = pagination.pageSize }) {
+function changeTable({ current = pagination.current, pageSize = pagination.pageSize}) {
   pagination.current = current
   const resetPage = pageSize !== pagination.pageSize
   pagination.pageSize = pageSize
   refresh(resetPage)
+}
+
+function handleSortChange({ current = pagination.current, pageSize = pagination.pageSize, field = sort.field, order = sort.order}) {
+  pagination.current = current
+  pagination.pageSize = pageSize
+  if (sort.field !== field || sort.order !== order) {
+    sort.field = field
+    sort.order = order
+    refresh(false)
+  }
 }
 
 function goTableDetail(record: IOptimizeTableItem) {
@@ -168,6 +182,12 @@ onMounted(() => {
       />
 
       <a-input
+          v-model:value="instantSearchInput"
+          :placeholder="placeholder.filterInstantPh"
+          @change="refresh"
+      />
+
+      <a-input
         v-model:value="tableSearchInput"
         :placeholder="placeholder.filterTablePh"
         @change="refresh"
@@ -175,7 +195,7 @@ onMounted(() => {
     </a-space>
     <a-table
       class="ant-table-common" :columns="columns" :data-source="dataSource" :pagination="pagination"
-      :loading="loading" @change="changeTable"
+      :loading="loading" @change="changeTable" @sort-change="handleSortChange"
     >
       <template #bodyCell="{ column, record }">
         <template v-if="column.dataIndex === 'tableName'">

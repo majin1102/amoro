@@ -308,7 +308,7 @@ export default defineComponent({
               v-model:value="DBSearchInput"
               :placeholder="placeholder.filterDBPh"
               class="theme-dark"
-              @change="handleSearch('db')"
+              @change="() => handleSearch('db')"
             >
               <template #prefix>
                 <SearchOutlined />

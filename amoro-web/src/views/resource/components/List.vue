@@ -51,8 +51,10 @@ const loading = ref<boolean>(false)
 const releaseLoading = ref<boolean>(false)
 const tableColumns = shallowReactive([
   { dataIndex: 'name', title: t('name'), ellipsis: true },
-  { dataIndex: 'container', title: t('container'), width: '23%', ellipsis: true },
-  { dataIndex: 'resourceOccupation', title: t('resourceOccupation'), width: '23%', ellipsis: true },
+  { dataIndex: 'rule', title: t('rule'), width: '12%', ellipsis: true },
+  { dataIndex: 'weight', title: t('weight'), width: '12%', ellipsis: true },
+  { dataIndex: 'container', title: t('container'), width: '12%', ellipsis: true },
+  { dataIndex: 'resourceOccupation', title: t('resourceOccupation'), width: '15%', ellipsis: true },
   { dataIndex: 'operationGroup', title: t('operation'), key: 'operationGroup', ellipsis: true, width: 230, scopedSlots: { customRender: 'operationGroup' } },
 ])
 const optimizerColumns = shallowReactive([
@@ -152,6 +154,8 @@ async function getResourceGroupsList() {
     (result || []).forEach((p: IIOptimizeGroupItem) => {
       p.name = p.resourceGroup.name
       p.container = p.resourceGroup.container
+      p.rule = p.resourceGroup.rule
+      p.weight = p.resourceGroup.weight
       p.resourceOccupation = `${p.occupationCore} ${t('core')} ${mbToSize(p.occupationMemory)}`
       groupList.push(p)
     })
@@ -197,13 +201,13 @@ const groupRecord = ref<IIOptimizeGroupItem>({
   container: '',
   resourceOccupation: '',
 })
-const scaleOutVisible = ref<boolean>(false)
+const scaleOutViseble = ref<boolean>(false)
 function scaleOutGroup(record: IIOptimizeGroupItem) {
   if (record.container === 'external') {
     return
   }
   groupRecord.value = { ...record }
-  scaleOutVisible.value = true
+  scaleOutViseble.value = true
 }
 
 function changeTable({ current = pagination.current, pageSize = pagination.pageSize }) {
@@ -221,10 +225,7 @@ onMounted(() => {
 <template>
   <div class="list-wrap">
     <a-table
-      class="ant-table-common"
-      :columns="columns"
-      :data-source="dataSource"
-      :pagination="pagination"
+      class="ant-table-common" :columns="columns" :data-source="dataSource" :pagination="pagination"
       :loading="loading" @change="changeTable"
     >
       <template #bodyCell="{ column, record }">
@@ -265,7 +266,7 @@ onMounted(() => {
       </template>
     </a-table>
   </div>
-  <ScaleOut v-if="scaleOutVisible" :group-record="groupRecord" @cancel="scaleOutVisible = false" @refresh="refresh" />
+  <ScaleOut v-if="scaleOutViseble" :group-record="groupRecord" @cancel="scaleOutViseble = false" @refresh="refresh" />
   <u-loading v-if="releaseLoading" />
 </template>
 

@@ -48,12 +48,12 @@ const TASK_STATUS_CONFIG = shallowReactive({
 const { t } = useI18n()
 const columns: IColumns[] = shallowReactive([
   { title: t('processId'), dataIndex: 'processId' },
-  { title: t('startTime'), dataIndex: 'startTime', width: 172 },
   { title: t('type'), dataIndex: 'optimizingType' },
   { title: t('status'), dataIndex: 'status' },
+  { title: t('startTime'), dataIndex: 'startTime', width: 172 },
   { title: t('duration'), dataIndex: 'duration', width: 120 },
-  { title: t('tasks'), dataIndex: 'tasks' },
-  { title: t('finishTime'), dataIndex: 'finishTime', width: 172 },
+//  { title: t('tasks'), dataIndex: 'tasks' },
+//  { title: t('finishTime'), dataIndex: 'finishTime', width: 172 },
   { title: t('input'), dataIndex: 'inputFiles' },
   { title: t('output'), dataIndex: 'outputFiles' },
 ])
@@ -107,7 +107,7 @@ async function refreshOptimizingProcesses() {
         startTime: item.startTime ? dateFormat(item.startTime) : '-',
         finishTime: item.finishTime ? dateFormat(item.finishTime) : '-',
         optimizingType: item.optimizingType ? item.optimizingType : '-',
-        duration: item.duration ? formatMS2Time(item.duration) : '-',
+        duration: formatMS2Time(item.duration || '-'),
         inputFiles: `${bytesToSize(inputFiles.totalSize)} / ${inputFiles.fileCnt}`,
         outputFiles: `${bytesToSize(outputFiles.totalSize)} / ${outputFiles.fileCnt}`,
         tasks: `${item.successTasks || '0'} / ${item.totalTasks || '0'}${item.runningTasks ? ` (${item.runningTasks} running)` : ''}`,
@@ -186,7 +186,7 @@ async function refreshOptimizingTasks() {
     list.forEach((p: BreadcrumbOptimizingItem) => {
       p.startTime = p.startTime ? dateFormat(p.startTime) : '-'
       p.endTime = p.endTime ? dateFormat(p.endTime) : '-'
-      p.formatCostTime = p.costTime ? formatMS2Time(p.costTime) : '-'
+      p.formatCostTime = formatMS2Time(p.costTime)
       p.thread = p.optimizerToken ? `(${p.threadId})${p.optimizerToken}` : '-'
       p.partitionData = p.partitionData ? p.partitionData : '-'
       p.inputFilesDesc = `${bytesToSize(p.inputFiles.totalSize)} / ${p.inputFiles.fileCnt}`
