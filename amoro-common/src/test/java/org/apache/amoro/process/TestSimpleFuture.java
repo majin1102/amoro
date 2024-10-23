@@ -129,7 +129,6 @@ public class TestSimpleFuture {
     Assert.assertFalse("SimpleFuture should not complete if callback error", simpleFuture.isDone());
 
     resetCallbackData(); // Trigger normal callback
-    simpleFuture.reset();
     simpleFuture.complete();
     for (int i = 0; i < 5; i++) {
       Assert.assertEquals("Current callback num: " + i, i, callbackNum[i]);
@@ -160,15 +159,13 @@ public class TestSimpleFuture {
     Assert.assertTrue("Future should be completed", simpleFuture.isDone());
   }
 
-  @Test
+  @Test(expected = AmoroRuntimeException.class)
   public void testJoinException() throws ExecutionException, InterruptedException {
     CompletableFuture<?> future = mock(CompletableFuture.class);
     doThrow(new RuntimeException()).when(future).get();
     SimpleFuture simpleFuture = new SimpleFuture(future);
-    simpleFuture.reset();
     simpleFuture.complete();
     simpleFuture.join();
-    Assert.assertTrue("Future should be completed", simpleFuture.isDone());
   }
 
   @Test

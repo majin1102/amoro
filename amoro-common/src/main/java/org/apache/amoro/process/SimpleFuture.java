@@ -18,6 +18,7 @@
 
 package org.apache.amoro.process;
 
+import java.util.ArrayList;
 import org.apache.amoro.exception.AmoroRuntimeException;
 
 import java.util.LinkedHashMap;
@@ -25,23 +26,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import org.apache.kerby.kerberos.kerb.type.ad.AndOr;
 
 /** A simple wrapper of CompletableFuture for better code readability. */
 public class SimpleFuture {
 
-  private final CompletableFuture<?> completedFuture = new CompletableFuture<>();
-  private final Map<Runnable, CompletableFuture<?>> callbackMap = new LinkedHashMap<>();
-  private CompletableFuture<?> triggerFuture;
-  private CompletableFuture<?> callbackFuture;
+  private final CompletableFuture<?> completedFuture;
+  private final List<Runnable> callbacks = new ArrayList<>();
 
   public SimpleFuture() {
     this(new CompletableFuture<>());
   }
 
-  protected SimpleFuture(CompletableFuture<?> triggerFuture) {
-    this.triggerFuture = triggerFuture;
-    this.callbackFuture = triggerFuture;
-    whenCompleted(() -> {});
+  protected SimpleFuture(CompletableFuture<?> completedFuture) {
+    this.completedFuture = completedFuture;
   }
 
   /**
@@ -49,30 +47,11 @@ public class SimpleFuture {
    * complete() method and will not trigger join return.
    */
   public void whenCompleted(Runnable runnable) {
-    callbackFuture =
-        callbackFuture.whenComplete(
-            (v, e) -> {
-              if (e == null) {
-                runnable.run();
-                if (callbackMap.get(runnable) == callbackFuture) {
-                  completedFuture.complete(null);
-                }
-              } else {
-                throw AmoroRuntimeException.wrap(e);
-              }
-            });
-    callbackMap.put(runnable, callbackFuture);
+    callbacks.add(runnable);
   }
 
   public boolean isDone() {
     return completedFuture.isDone();
-  }
-
-  public void reset() {
-    triggerFuture = new CompletableFuture<>();
-    callbackFuture = triggerFuture;
-    whenCompleted(() -> {});
-    callbackMap.keySet().forEach(this::whenCompleted);
   }
 
   /**
@@ -80,10 +59,19 @@ public class SimpleFuture {
    * functions are completed. If throws exception, completedFuture is not done.
    */
   public void complete() {
-    try {
-      if (triggerFuture.complete(null)) {
-        callbackFuture.get();
+    if (completedFuture.isDone()) {
+      return;
+    }
+    callbacks.forEach(runnable -> {
+      try {
+        runnable.run();
+      } catch (Throwable throwable) {
+        throw normalize(throwable);
       }
+    });
+    completedFuture.complete(null);
+    try {
+      completedFuture.get();
     } catch (Throwable throwable) {
       throw normalize(throwable);
     }
@@ -98,7 +86,7 @@ public class SimpleFuture {
     }
   }
 
-  private AmoroRuntimeException normalize(Throwable throwable) {
+  private static AmoroRuntimeException normalize(Throwable throwable) {
     if (throwable instanceof ExecutionException && throwable.getCause() != null) {
       return AmoroRuntimeException.wrap(throwable.getCause());
     }
@@ -116,14 +104,34 @@ public class SimpleFuture {
   }
 
   public static SimpleFuture allOf(List<SimpleFuture> futures) {
-    return new SimpleFuture(
+    SimpleFuture allFuture = new SimpleFuture();
+    CompletableFuture<?> chainedFuture =
         CompletableFuture.allOf(
-            futures.stream().map(f -> f.completedFuture).toArray(CompletableFuture[]::new)));
+            futures.stream().map(f -> f.completedFuture).toArray(CompletableFuture[]::new));
+    chainedFuture.whenComplete(
+        (result, throwable) -> {
+          if (throwable == null) {
+            allFuture.complete();
+          } else {
+            throw normalize(throwable);
+          }
+        });
+    return allFuture;
   }
 
   public static SimpleFuture anyOf(List<SimpleFuture> futures) {
-    return new SimpleFuture(
+    SimpleFuture anyFuture = new SimpleFuture();
+    CompletableFuture<?> chainedFuture =
         CompletableFuture.anyOf(
-            futures.stream().map(f -> f.completedFuture).toArray(CompletableFuture[]::new)));
+            futures.stream().map(f -> f.completedFuture).toArray(CompletableFuture[]::new));
+    chainedFuture.whenComplete(
+        (result, throwable) -> {
+          if (throwable == null) {
+            anyFuture.complete();
+          } else {
+            throw normalize(throwable);
+          }
+        });
+    return anyFuture;
   }
 }
