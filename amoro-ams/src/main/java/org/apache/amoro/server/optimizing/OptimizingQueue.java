@@ -33,6 +33,7 @@ import org.apache.amoro.server.persistence.PersistentBase;
 import org.apache.amoro.server.persistence.TaskFilesPersistence;
 import org.apache.amoro.server.persistence.mapper.OptimizingMapper;
 import org.apache.amoro.server.resource.OptimizerInstance;
+import org.apache.amoro.server.resource.OptimizerThread;
 import org.apache.amoro.server.resource.QuotaProvider;
 import org.apache.amoro.server.table.TableManager;
 import org.apache.amoro.server.table.TableRuntime;
@@ -171,11 +172,21 @@ public class OptimizingQueue extends PersistentBase {
         taskRuntime -> taskRuntime.getTaskId().getProcessId() == optimizingProcess.getProcessId());
   }
 
-  public TaskRuntime<?> pollTask(long maxWaitTime) {
+  public TaskRuntime<?> pollTask(long maxWaitTime, OptimizerThread optimizerThread) {
     long deadline = calculateDeadline(maxWaitTime);
     TaskRuntime<?> task = fetchTask();
     while (task == null && waitTask(deadline)) {
       task = fetchTask();
+    }
+    if (task != null) {
+      LOG.info("OptimizerThread {} polled task {}", optimizerThread, task.getTaskId());
+      try {
+        task.schedule(optimizerThread);
+      } catch (RuntimeException throwable) {
+        retryTaskQueue.offer(task);
+        LOG.error("Schedule task {} failed, put it to retry queue", task.getTaskId(), throwable);
+        throw throwable;
+      }
     }
     return task;
   }
