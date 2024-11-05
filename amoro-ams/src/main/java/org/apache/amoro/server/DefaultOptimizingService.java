@@ -193,23 +193,10 @@ public class DefaultOptimizingService extends StatedPersistentBase
   public OptimizingTask pollTask(String authToken, int threadId) {
     LOG.debug("Optimizer {} (threadId {}) try polling task", authToken, threadId);
     OptimizingQueue queue = getQueueByToken(authToken);
-    return Optional.ofNullable(queue.pollTask(pollingTimeout))
-        .map(task -> extractOptimizingTask(task, authToken, threadId, queue))
+    OptimizerThread optimizerThread = getAuthenticatedOptimizer(authToken).getThread(threadId);
+    return Optional.ofNullable(queue.pollTask(pollingTimeout, optimizerThread))
+        .map(TaskRuntime::extractProtocolTask)
         .orElse(null);
-  }
-
-  private OptimizingTask extractOptimizingTask(
-      TaskRuntime task, String authToken, int threadId, OptimizingQueue queue) {
-    try {
-      OptimizerThread optimizerThread = getAuthenticatedOptimizer(authToken).getThread(threadId);
-      task.schedule(optimizerThread);
-      LOG.info("OptimizerThread {} polled task {}", optimizerThread, task.getTaskId());
-      return task.extractProtocolTask();
-    } catch (Throwable throwable) {
-      LOG.error("Schedule task {} failed, put it to retry queue", task.getTaskId(), throwable);
-      queue.retryTask(task);
-      return null;
-    }
   }
 
   @Override
