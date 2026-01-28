@@ -43,6 +43,7 @@ import org.apache.amoro.server.catalog.CatalogManager;
 import org.apache.amoro.server.dashboard.controller.ApiTokenController;
 import org.apache.amoro.server.dashboard.controller.CatalogController;
 import org.apache.amoro.server.dashboard.controller.HealthCheckController;
+import org.apache.amoro.server.dashboard.controller.IndexController;
 import org.apache.amoro.server.dashboard.controller.LoginController;
 import org.apache.amoro.server.dashboard.controller.OptimizerController;
 import org.apache.amoro.server.dashboard.controller.OptimizerGroupController;
@@ -86,6 +87,7 @@ public class DashboardServer {
   private final PlatformFileInfoController platformFileInfoController;
   private final SettingController settingController;
   private final TableController tableController;
+  private final IndexController indexController;
   private final TerminalController terminalController;
   private final VersionController versionController;
   private final OverviewController overviewController;
@@ -114,6 +116,7 @@ public class DashboardServer {
         new ServerTableDescriptor(catalogManager, tableManager, serviceConfig);
     this.tableController =
         new TableController(catalogManager, tableManager, tableDescriptor, serviceConfig);
+    this.indexController = new IndexController(tableDescriptor);
     this.terminalController = new TerminalController(terminalManager);
     this.versionController = new VersionController();
     OverviewManager manager = new OverviewManager(serviceConfig);
@@ -268,6 +271,10 @@ public class DashboardServer {
             get(
                 "/catalogs/{catalog}/dbs/{db}/tables/{table}/snapshots/{snapshotId}/detail",
                 tableController::getSnapshotDetail);
+            get("/catalogs/{catalog}/dbs/{db}/tables/{table}/indexes", indexController::getIndexes);
+            get(
+                "/catalogs/{catalog}/dbs/{db}/tables/{table}/indexes/{indexName}/detail",
+                indexController::getIndexDetail);
             get(
                 "/catalogs/{catalog}/dbs/{db}/tables/{table}/partitions",
                 tableController::getTablePartitions);

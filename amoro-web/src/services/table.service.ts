@@ -17,7 +17,7 @@
   */
 
 // import { IOptions } from '@/types/common.type'
-import type { ICatalogItem, IMap } from '@/types/common.type'
+import type { ICatalogItem, IMap, IndexItem } from '@/types/common.type'
 import request from '@/utils/request'
 
 export function getCatalogList(): Promise<ICatalogItem[]> {
@@ -136,6 +136,33 @@ export function getDetailBySnapshotId(
 ) {
   const { catalog, db, table, snapshotId, page, pageSize, ref, token } = params
   return request.get(`api/ams/v1/tables/catalogs/${catalog}/dbs/${db}/tables/${table}/snapshots/${snapshotId}/detail`, { params: { page, pageSize, ref, token } })
+}
+
+// get indexes
+export function getIndexes(
+  params: {
+    catalog: string
+    db: string
+    table: string
+    token?: string
+  },
+): Promise<IndexItem[]> {
+  const { catalog, db, table, token } = params
+  return request.get(`api/ams/v1/tables/catalogs/${catalog}/dbs/${db}/tables/${table}/indexes`, { params: { token } })
+}
+
+// get index detail
+export function getIndexDetail(
+  params: {
+    catalog: string
+    db: string
+    table: string
+    indexName: string
+    token?: string
+  },
+) {
+  const { catalog, db, table, indexName, token } = params
+  return request.get(`api/ams/v1/tables/catalogs/${catalog}/dbs/${db}/tables/${table}/indexes/${indexName}/detail`, { params: { token } })
 }
 // get operations
 export function getOperations(

@@ -200,6 +200,16 @@ export interface SnapshotItemSummary {
   'total-equality-deletes': number
 }
 
+export interface IndexItem {
+  name: string
+  fields: string[] | string
+  type: string
+  snapshot: string
+  coverage: string
+}
+
+export type IndexDetail = Record<string, string | number | boolean>
+
 export interface SnapshotItem {
   snapshotId: string
   operation: string

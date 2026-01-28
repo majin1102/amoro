@@ -23,6 +23,7 @@ import org.apache.amoro.TableFormat;
 import org.apache.amoro.process.ProcessStatus;
 import org.apache.commons.lang3.tuple.Pair;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
@@ -79,4 +80,24 @@ public interface FormatTableDescriptor {
 
   /** Get the consumer information of the {@link AmoroTable}. */
   List<ConsumerInfo> getTableConsumerInfos(AmoroTable<?> amoroTable);
+
+  /**
+   * Get table indexes of the {@link AmoroTable}.
+   *
+   * <p>Default implementation returns an empty list so that non-Lance formats do not need to
+   * provide index information.
+   */
+  default List<TableIndex> getTableIndexes(AmoroTable<?> amoroTable) {
+    return Collections.emptyList();
+  }
+
+  /**
+   * Get detailed statistics of a table index of the {@link AmoroTable}.
+   *
+   * <p>Default implementation returns an empty map so that non-Lance formats do not need to provide
+   * index information.
+   */
+  default Map<String, Object> getTableIndexDetail(AmoroTable<?> amoroTable, String indexName) {
+    return Collections.emptyMap();
+  }
 }

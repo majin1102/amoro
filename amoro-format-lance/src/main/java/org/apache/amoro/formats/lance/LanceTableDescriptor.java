@@ -32,6 +32,7 @@ import org.apache.amoro.table.descriptor.OptimizingTaskInfo;
 import org.apache.amoro.table.descriptor.PartitionBaseInfo;
 import org.apache.amoro.table.descriptor.PartitionFileBaseInfo;
 import org.apache.amoro.table.descriptor.ServerTableMeta;
+import org.apache.amoro.table.descriptor.TableIndex;
 import org.apache.amoro.table.descriptor.TableSummary;
 import org.apache.amoro.table.descriptor.TagOrBranchInfo;
 import org.apache.amoro.utils.CommonUtil;
@@ -47,7 +48,11 @@ import org.lance.Tag;
 import org.lance.Version;
 import org.lance.fragment.DataFile;
 import org.lance.fragment.DeletionFile;
+import org.lance.index.Index;
+import org.lance.index.IndexDescription;
+import org.lance.schema.LanceField;
 
+import java.text.DecimalFormat;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -57,6 +62,7 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
+import java.util.stream.Collectors;
 
 /** Table descriptor for Lance tables. */
 public class LanceTableDescriptor implements FormatTableDescriptor {
@@ -290,6 +296,42 @@ public class LanceTableDescriptor implements FormatTableDescriptor {
     return Collections.emptyList();
   }
 
+  @Override
+  public List<TableIndex> getTableIndexes(AmoroTable<?> amoroTable) {
+    Dataset dataset = (Dataset) amoroTable.originalTable();
+
+    List<Index> indexes = dataset.getIndexes();
+    if (indexes == null || indexes.isEmpty()) {
+      return Collections.emptyList();
+    }
+
+    long totalRows = dataset.getVersion().getManifestSummary().getTotalRows();
+    List<IndexDescription> indexDescriptions = dataset.describeIndices();
+    Map<String, Long> indexedRowsByName =
+        indexDescriptions.stream()
+            .collect(Collectors.toMap(IndexDescription::getName, IndexDescription::getRowsIndexed));
+
+    return indexes.stream()
+        .map(
+            index ->
+                new TableIndex(
+                    index.name(),
+                    dataset.getLanceSchema().fields().stream()
+                        .filter(field -> index.fields().contains(field.getId()))
+                        .map(LanceField::getName)
+                        .collect(Collectors.toList()),
+                    index.indexType().toString(),
+                    String.valueOf(index.indexVersion()),
+                    formatCoverage(indexedRowsByName.get(index.name()), totalRows)))
+        .collect(Collectors.toList());
+  }
+
+  @Override
+  public Map<String, Object> getTableIndexDetail(AmoroTable<?> amoroTable, String indexName) {
+    Dataset dataset = (Dataset) amoroTable.originalTable();
+    return dataset.getIndexStatistics(indexName);
+  }
+
   private AmoroSnapshotsOfTable buildSnapshot(Version version) {
     ManifestSummary summary = version.getManifestSummary();
     AmoroSnapshotsOfTable snapshot = new AmoroSnapshotsOfTable();
@@ -307,6 +349,15 @@ public class LanceTableDescriptor implements FormatTableDescriptor {
     snapshot.setFilesSummaryForChart(filesSummary);
 
     return snapshot;
+  }
+
+  private String formatCoverage(Long indexedRows, long totalRows) {
+    if (indexedRows == null || indexedRows <= 0L || totalRows <= 0L) {
+      return "0%";
+    }
+    double ratio = (double) indexedRows * 100.0d / (double) totalRows;
+    DecimalFormat df = new DecimalFormat("0.0#");
+    return df.format(ratio) + "%";
   }
 
   private long toMillis(ZonedDateTime time) {

@@ -24,6 +24,7 @@ import UFiles from './components/Files.vue'
 import UOperations from './components/Operations.vue'
 import USnapshots from './components/Snapshots.vue'
 import UOptimizing from './components/Optimizing.vue'
+import UIndexes from './components/Indexes.vue'
 import UHealthScore from './components/HealthScoreDetails.vue'
 import TableExplorer from './components/TableExplorer.vue'
 import useStore from '@/store/index'
@@ -37,6 +38,7 @@ export default defineComponent({
     UOperations,
     USnapshots,
     UOptimizing,
+    UIndexes,
     UHealthScore,
     TableExplorer,
   },
@@ -102,6 +104,7 @@ export default defineComponent({
     }
 
     const tabConfigs = shallowReactive([
+      { key: 'Indexes', label: 'indexes' },
       { key: 'Snapshots', label: 'snapshots' },
       { key: 'Optimizing', label: 'optimizing' },
       { key: 'Operations', label: 'operations' },
@@ -126,6 +129,11 @@ export default defineComponent({
       } as IBaseDetailInfo,
       detailLoaded: false,
     })
+
+    const isLanceFormat = computed(() => (state.baseInfo.tableFormat || '').toUpperCase() === 'LANCE')
+    const displayTabConfigs = computed(() =>
+      tabConfigs.filter(tab => tab.key !== 'Indexes' || isLanceFormat.value),
+    )
 
     const isIceberg = computed(() => {
       return state.baseInfo.tableType === 'ICEBERG'
@@ -203,6 +211,7 @@ export default defineComponent({
       ...toRefs(state),
       detailRef,
       tabConfigs,
+      displayTabConfigs,
       store,
       isIceberg,
       hasSelectedTable,
@@ -262,7 +271,7 @@ export default defineComponent({
               <a-tab-pane v-if="detailLoaded" key="Files" :tab="$t('files')">
                 <UFiles :has-partition="baseInfo.hasPartition" />
               </a-tab-pane>
-              <a-tab-pane v-for="tab in tabConfigs" :key="tab.key" :tab="$t(tab.label)">
+              <a-tab-pane v-for="tab in displayTabConfigs" :key="tab.key" :tab="$t(tab.label)">
                 <component :is="`U${tab.key}`" />
               </a-tab-pane>
             </a-tabs>
