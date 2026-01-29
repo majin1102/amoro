@@ -18,6 +18,7 @@
 
 package org.apache.amoro.formats.lance;
 
+import java.util.Optional;
 import org.apache.amoro.AmoroTable;
 import org.apache.amoro.TableFormat;
 import org.apache.amoro.process.ProcessStatus;
@@ -45,6 +46,7 @@ import org.lance.Fragment;
 import org.lance.FragmentMetadata;
 import org.lance.ManifestSummary;
 import org.lance.Tag;
+import org.lance.Transaction;
 import org.lance.Version;
 import org.lance.fragment.DataFile;
 import org.lance.fragment.DeletionFile;
@@ -153,14 +155,14 @@ public class LanceTableDescriptor implements FormatTableDescriptor {
     if (ioExecutor == null) {
       List<AmoroSnapshotsOfTable> snapshots = new ArrayList<>();
       for (Version version : versions) {
-        snapshots.add(buildSnapshot(version));
+        snapshots.add(buildSnapshot(version, dataset));
       }
       return snapshots;
     }
 
     List<CompletableFuture<AmoroSnapshotsOfTable>> futures = new ArrayList<>();
     for (Version version : versions) {
-      futures.add(CompletableFuture.supplyAsync(() -> buildSnapshot(version), ioExecutor));
+      futures.add(CompletableFuture.supplyAsync(() -> buildSnapshot(version, dataset), ioExecutor));
     }
 
     List<AmoroSnapshotsOfTable> snapshots = new ArrayList<>();
@@ -332,21 +334,42 @@ public class LanceTableDescriptor implements FormatTableDescriptor {
     return dataset.getIndexStatistics(indexName);
   }
 
-  private AmoroSnapshotsOfTable buildSnapshot(Version version) {
-    ManifestSummary summary = version.getManifestSummary();
+  private AmoroSnapshotsOfTable buildSnapshot(Version version, Dataset dataset) {
+    dataset = dataset.checkoutVersion(version.getId() - 1 > 0 ? version.getId() - 1 : 1);
+    ManifestSummary manifestSummary = version.getManifestSummary();
+    Optional<Transaction> transaction = dataset.readTransaction();
     AmoroSnapshotsOfTable snapshot = new AmoroSnapshotsOfTable();
     snapshot.setSnapshotId(String.valueOf(version.getId()));
     snapshot.setCommitTime(toMillis(version.getDataTime()));
-    snapshot.setFileCount((int) summary.getTotalDataFiles());
-    snapshot.setFileSize(summary.getTotalFilesSize());
-    snapshot.setRecords(summary.getTotalRows());
-    snapshot.setOperation("WRITE");
+    snapshot.setFileCount((int) manifestSummary.getTotalDataFiles());
+    snapshot.setFileSize(manifestSummary.getTotalFilesSize());
+    snapshot.setRecords(manifestSummary.getTotalRows());
+    snapshot.setOperation("None");
+    Map<String, String> summary = new HashMap<>();
+    summary.put("total-rows", String.valueOf(manifestSummary.getTotalRows()));
+    summary.put("total-datafile-rows", String.valueOf(manifestSummary.getTotalDataFileRows()));
+    summary.put("total-deletion-rows", String.valueOf(manifestSummary.getTotalDeletionFileRows()));
+    summary.put("total-data-files", String.valueOf(manifestSummary.getTotalDataFiles()));
+    summary.put("total-deletion-files", String.valueOf(manifestSummary.getTotalDeletionFiles()));
+    summary.put("total-files-size", String.valueOf(manifestSummary.getTotalFilesSize()));
+    summary.put("total-fragments", String.valueOf(manifestSummary.getTotalFragments()));
+    snapshot.setSummary(summary);
+
+    transaction.ifPresent(tx -> {
+      snapshot.setOperation(tx.operation().name());
+      summary.put("transaction-uuid", tx.uuid());
+      summary.put("read-version", String.valueOf(tx.readVersion()));
+      tx.transactionProperties().ifPresent(summary::putAll);
+    });
 
     Map<String, String> filesSummary = new HashMap<>();
-    filesSummary.put("data-files", String.valueOf(summary.getTotalDataFiles()));
-    filesSummary.put("delta-files", String.valueOf(summary.getTotalDeletionFiles()));
-    filesSummary.put("changelogs", "0");
+    filesSummary.put("data-files", String.valueOf(manifestSummary.getTotalDataFiles()));
+    filesSummary.put("delta-files", String.valueOf(manifestSummary.getTotalDeletionFiles()));
     snapshot.setFilesSummaryForChart(filesSummary);
+
+    Map<String, String> recordsSummary = new HashMap<>();
+    recordsSummary.put("total-records", String.valueOf(manifestSummary.getTotalRows()));
+    snapshot.setRecordsSummaryForChart(recordsSummary);
 
     return snapshot;
   }

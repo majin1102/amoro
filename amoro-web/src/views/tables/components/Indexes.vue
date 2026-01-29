@@ -192,6 +192,10 @@ onMounted(() => {
   .empty-detail {
     padding: 8px 24px;
   }
+
+  :deep(.ant-table-row-expand-icon) {
+    border-radius: 0 !important;
+  }
 }
 
 .json-pre {
