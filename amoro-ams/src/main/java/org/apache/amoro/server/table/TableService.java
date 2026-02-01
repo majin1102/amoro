@@ -21,19 +21,18 @@ package org.apache.amoro.server.table;
 import org.apache.amoro.AmoroTable;
 import org.apache.amoro.ServerTableIdentifier;
 import org.apache.amoro.TableRuntime;
+import org.apache.amoro.api.TableIdentifier;
 import org.apache.amoro.server.catalog.InternalCatalog;
 
-public interface TableService extends TableRuntimeHandler {
-
-  void addHandlerChain(RuntimeHandlerChain handler);
+public interface TableService {
 
   void initialize();
 
   void dispose();
 
-  void onTableCreated(InternalCatalog catalog, ServerTableIdentifier identifier);
+  void createTable(TableMetadata tableMetadata);
 
-  void onTableDropped(InternalCatalog catalog, ServerTableIdentifier identifier);
+  void dropTable(TableIdentifier identifier);
 
   TableRuntime getRuntime(Long tableId);
 

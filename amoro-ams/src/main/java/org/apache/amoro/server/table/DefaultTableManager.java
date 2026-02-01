@@ -75,12 +75,9 @@ public class DefaultTableManager extends PersistentBase implements TableManager 
   private static final int TABLE_BLOCKER_RETRY = 3;
   private final long blockerTimeout;
 
-  private final CatalogManager catalogManager;
-
   private @Nullable TableService tableService;
 
-  public DefaultTableManager(Configurations configuration, CatalogManager catalogManager) {
-    this.catalogManager = catalogManager;
+  public DefaultTableManager(Configurations configuration) {
     this.blockerTimeout = configuration.get(AmoroManagementConf.BLOCKER_TIMEOUT).toMillis();
   }
 
@@ -95,40 +92,12 @@ public class DefaultTableManager extends PersistentBase implements TableManager 
 
   @Override
   public void dropTableMetadata(TableIdentifier tableIdentifier, boolean deleteData) {
-    if (StringUtils.isBlank(tableIdentifier.getTableName())) {
-      throw new IllegalMetadataException("table name is blank");
-    }
-    if (StringUtils.isBlank(tableIdentifier.getCatalog())) {
-      throw new IllegalMetadataException("catalog is blank");
-    }
-    if (StringUtils.isBlank(tableIdentifier.getDatabase())) {
-      throw new IllegalMetadataException("database is blank");
-    }
-
-    InternalCatalog internalCatalog =
-        catalogManager.getInternalCatalog(tableIdentifier.getCatalog());
-    String database = tableIdentifier.getDatabase();
-    String table = tableIdentifier.getTableName();
-    if (!internalCatalog.tableExists(database, table)) {
-      throw new ObjectNotExistsException(tableIdentifier);
-    }
-
-    ServerTableIdentifier serverTableIdentifier = internalCatalog.dropTable(database, table);
-    tableService().ifPresent(s -> s.onTableDropped(internalCatalog, serverTableIdentifier));
+    tableService.dropTable(tableIdentifier);
   }
 
   @Override
   public void createTable(String catalogName, TableMetadata tableMetadata) {
-    InternalCatalog catalog = catalogManager.getInternalCatalog(catalogName);
-    String database = tableMetadata.getTableIdentifier().getDatabase();
-    String table = tableMetadata.getTableIdentifier().getTableName();
-    if (catalog.tableExists(database, table)) {
-      throw new AlreadyExistsException(
-          tableMetadata.getTableIdentifier().getIdentifier().buildTableIdentifier());
-    }
-
-    TableMetadata metadata = catalog.createTable(tableMetadata);
-    tableService().ifPresent(s -> s.onTableCreated(catalog, metadata.getTableIdentifier()));
+    tableService.createTable(tableMetadata);
   }
 
   @Override

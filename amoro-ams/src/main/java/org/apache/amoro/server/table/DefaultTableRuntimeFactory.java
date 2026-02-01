@@ -42,7 +42,7 @@ public class DefaultTableRuntimeFactory implements TableRuntimeFactory {
   }
 
   @Override
-  public Optional<TableRuntimeCreator> accept(
+  public Optional<Creator> accept(
       ServerTableIdentifier tableIdentifier, Map<String, String> tableProperties) {
     if (tableIdentifier
         .getFormat()
@@ -52,7 +52,12 @@ public class DefaultTableRuntimeFactory implements TableRuntimeFactory {
     return Optional.empty();
   }
 
-  private static class TableRuntimeCreatorImpl implements TableRuntimeFactory.TableRuntimeCreator {
+  @Override
+  public Optional<TableRuntime> create(ServerTableIdentifier tableIdentifier, Map<String, String> properties) {
+    throw new IllegalStateException("Use accept to get a creator first");
+  }
+
+  private static class TableRuntimeCreatorImpl implements TableRuntimeFactory.Creator {
     @Override
     public List<StateKey<?>> requiredStateKeys() {
       return DefaultTableRuntime.REQUIRED_STATES;

@@ -26,6 +26,9 @@ import org.apache.amoro.TableRuntime;
 import org.apache.amoro.api.CatalogMeta;
 import org.apache.amoro.config.Configurations;
 import org.apache.amoro.config.TableConfiguration;
+import org.apache.amoro.exception.AlreadyExistsException;
+import org.apache.amoro.exception.IllegalMetadataException;
+import org.apache.amoro.exception.ObjectNotExistsException;
 import org.apache.amoro.server.AmoroManagementConf;
 import org.apache.amoro.server.catalog.CatalogManager;
 import org.apache.amoro.server.catalog.ExternalCatalog;
@@ -44,8 +47,10 @@ import org.apache.amoro.shade.guava32.com.google.common.base.Objects;
 import org.apache.amoro.shade.guava32.com.google.common.collect.Lists;
 import org.apache.amoro.shade.guava32.com.google.common.collect.Sets;
 import org.apache.amoro.shade.guava32.com.google.common.util.concurrent.ThreadFactoryBuilder;
+import org.apache.amoro.api.TableIdentifier;
 import org.apache.amoro.table.TableSummary;
 import org.apache.amoro.utils.TablePropertyUtil;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -74,8 +79,8 @@ public class DefaultTableService extends PersistentBase implements TableService 
   public static final Logger LOG = LoggerFactory.getLogger(DefaultTableService.class);
   private final long externalCatalogRefreshingInterval;
 
-  private final Map<Long, TableRuntime> tableRuntimeMap = new ConcurrentHashMap<>();
-
+  protected final Map<Long, TableRuntime> tableRuntimeMap = new ConcurrentHashMap<>();
+  protected final TableRuntimeFactoryManager tableRuntimeFactoryManager;
   private final ScheduledExecutorService tableExplorerScheduler =
       Executors.newSingleThreadScheduledExecutor(
           new ThreadFactoryBuilder()
@@ -85,75 +90,31 @@ public class DefaultTableService extends PersistentBase implements TableService 
   private final CompletableFuture<Boolean> initialized = new CompletableFuture<>();
   private final Configurations serverConfiguration;
   private final CatalogManager catalogManager;
-  private final TableRuntimeFactoryManager tableRuntimeFactoryManager;
-  private RuntimeHandlerChain headHandler;
+  private final List<TableRuntimePlugin> tableRuntimePlugins;
   private ExecutorService tableExplorerExecutors;
 
-  public DefaultTableService(
+  private DefaultTableService(
       Configurations configuration,
       CatalogManager catalogManager,
-      TableRuntimeFactoryManager tableRuntimeFactoryManager) {
+      TableRuntimeFactoryManager tableRuntimeFactoryManager,
+      List<TableRuntimePlugin> tableRuntimePlugins) {
     this.catalogManager = catalogManager;
     this.externalCatalogRefreshingInterval =
         configuration.get(AmoroManagementConf.REFRESH_EXTERNAL_CATALOGS_INTERVAL).toMillis();
     this.serverConfiguration = configuration;
     this.tableRuntimeFactoryManager = tableRuntimeFactoryManager;
-  }
-
-  @Override
-  public void onTableCreated(InternalCatalog catalog, ServerTableIdentifier identifier) {
-    triggerTableAdded(catalog, identifier);
-  }
-
-  @Override
-  public void onTableDropped(InternalCatalog catalog, ServerTableIdentifier identifier) {
-    Optional.ofNullable(tableRuntimeMap.get(identifier.getId()))
-        .ifPresent(
-            tableRuntime -> {
-              try {
-                if (headHandler != null) {
-                  headHandler.fireTableRemoved(tableRuntime);
-                }
-                tableRuntime.dispose();
-                tableRuntimeMap.remove(
-                    identifier.getId()); // remove only after successful operation
-              } catch (Exception e) {
-                LOG.error(
-                    "Error occurred while removing tableRuntime of table {}",
-                    identifier.getId(),
-                    e);
-              }
-            });
-  }
-
-  @Override
-  public void addHandlerChain(RuntimeHandlerChain handler) {
-    checkNotStarted();
-    if (headHandler == null) {
-      headHandler = handler;
-    } else {
-      headHandler.appendNext(handler);
-    }
-  }
-
-  @Override
-  public void handleTableChanged(TableRuntime tableRuntime, OptimizingStatus originalStatus) {
-    if (headHandler != null) {
-      headHandler.fireStatusChanged(tableRuntime, originalStatus);
-    }
-  }
-
-  @Override
-  public void handleTableChanged(TableRuntime tableRuntime, TableConfiguration originalConfig) {
-    if (headHandler != null) {
-      headHandler.fireConfigChanged(tableRuntime, originalConfig);
-    }
+    this.tableRuntimePlugins = tableRuntimePlugins;
   }
 
   @Override
   public void initialize() {
     checkNotStarted();
+    initTableRuntimes();
+    initTableRuntimePlugins();
+    initTableExplorer();
+  }
 
+  private void initTableRuntimes() {
     List<TableRuntimeMeta> tableRuntimeMetaList =
         getAs(TableRuntimeMapper.class, TableRuntimeMapper::selectAllRuntimes);
     Map<Long, ServerTableIdentifier> identifierMap =
@@ -171,8 +132,6 @@ public class DefaultTableService extends PersistentBase implements TableService 
                       return a;
                     }));
 
-    List<TableRuntime> tableRuntimes = new ArrayList<>(tableRuntimeMetaList.size());
-
     for (TableRuntimeMeta tableRuntimeMeta : tableRuntimeMetaList) {
       ServerTableIdentifier identifier = identifierMap.get(tableRuntimeMeta.getTableId());
       if (identifier == null) {
@@ -182,23 +141,44 @@ public class DefaultTableService extends PersistentBase implements TableService 
         continue;
       }
       List<TableRuntimeState> states = statesMap.get(tableRuntimeMeta.getTableId());
-      Optional<TableRuntime> tableRuntime =
-          createTableRuntime(identifier, tableRuntimeMeta, states);
-      if (!tableRuntime.isPresent()) {
-        LOG.warn("No available table runtime factory found for table {}", identifier);
-        continue;
-      }
-      tableRuntime.ifPresent(
-          t -> {
-            t.registerMetric(MetricManager.getInstance().getGlobalRegistry());
-            tableRuntimeMap.put(t.getTableIdentifier().getId(), t);
-            tableRuntimes.add(t);
-          });
+      createTableRuntime(identifier, tableRuntimeMeta, states).ifPresentOrElse(
+          tableRuntime -> tableRuntimeMap.put(tableRuntime.getTableIdentifier().getId(), tableRuntime),
+          () -> LOG.warn("No available table runtime factory found for table {}", identifier)
+      );
     }
+  }
 
-    if (headHandler != null) {
-      headHandler.initialize(tableRuntimes);
-    }
+  private void initTableRuntimePlugins() {
+    List<TableRuntime> tableRuntimes = new ArrayList<>(tableRuntimeMap.values());
+    tableRuntimePlugins.forEach(plugin -> plugin.initialize(tableRuntimes));
+  }
+
+  private Optional<TableRuntime> createTableRuntime(
+      ServerTableIdentifier identifier,
+      TableRuntimeMeta runtimeMeta,
+      List<TableRuntimeState> restoredStates) {
+    return tableRuntimeFactoryManager.installedPlugins().stream()
+        .map(f -> f.accept(identifier, runtimeMeta.getTableConfig()))
+        .filter(Optional::isPresent)
+        .map(Optional::get)
+        .findFirst()
+        .map(
+            creator -> {
+              DefaultTableRuntimeStore store =
+                  new DefaultTableRuntimeStore(
+                      identifier, runtimeMeta, creator.requiredStateKeys(), restoredStates);
+              TableRuntime tableRuntime = tableRuntimePlugins.stream()
+                  .filter(plugin -> plugin.accept(identifier))
+                  .findFirst()
+                  .map(plugin -> plugin.createTableRuntime(creator, store))
+                  .orElse(creator.create(store));
+              tableRuntime.registerMetric(MetricManager.getInstance().getGlobalRegistry());
+              store.setTableRuntime(tableRuntime);
+              return tableRuntime;
+            });
+  }
+
+  private void initTableExplorer() {
     if (tableExplorerExecutors == null) {
       int threadCount =
           serverConfiguration.getInteger(
@@ -235,12 +215,6 @@ public class DefaultTableService extends PersistentBase implements TableService 
   }
 
   @Override
-  public boolean contains(Long tableId) {
-    checkStarted();
-    return tableRuntimeMap.containsKey(tableId);
-  }
-
-  @Override
   public AmoroTable<?> loadTable(ServerTableIdentifier identifier) {
     return catalogManager.loadTable(identifier.getIdentifier());
   }
@@ -251,10 +225,47 @@ public class DefaultTableService extends PersistentBase implements TableService 
     if (tableExplorerExecutors != null) {
       tableExplorerExecutors.shutdown();
     }
-    if (headHandler != null) {
-      headHandler.dispose();
-    }
+    tableRuntimePlugins.forEach(TableRuntimePlugin::dispose);
     tableRuntimeMap.values().forEach(TableRuntime::unregisterMetric);
+  }
+
+  @Override
+  public void createTable(TableMetadata tableMetadata) {
+    String catalogName = tableMetadata.getTableIdentifier().getCatalog();
+    String database = tableMetadata.getTableIdentifier().getDatabase();
+    String table = tableMetadata.getTableIdentifier().getTableName();
+    InternalCatalog catalog = catalogManager.getInternalCatalog(catalogName);
+    if (catalog.tableExists(database, table)) {
+      throw new AlreadyExistsException(
+          tableMetadata.getTableIdentifier().getIdentifier().buildTableIdentifier());
+    }
+
+    TableMetadata metadata = catalog.createTable(tableMetadata);
+    triggerTableAdded(metadata.getTableIdentifier());
+  }
+
+  @Override
+  public void dropTable(TableIdentifier tableIdentifier) {
+    if (StringUtils.isBlank(tableIdentifier.getTableName())) {
+      throw new IllegalMetadataException("table name is blank");
+    }
+    if (StringUtils.isBlank(tableIdentifier.getCatalog())) {
+      throw new IllegalMetadataException("catalog is blank");
+    }
+    if (StringUtils.isBlank(tableIdentifier.getDatabase())) {
+      throw new IllegalMetadataException("database is blank");
+    }
+
+    InternalCatalog internalCatalog =
+        catalogManager.getInternalCatalog(tableIdentifier.getCatalog());
+    String database = tableIdentifier.getDatabase();
+    String table = tableIdentifier.getTableName();
+    if (!internalCatalog.tableExists(database, table)) {
+      throw new ObjectNotExistsException(tableIdentifier);
+    }
+
+    ServerTableIdentifier serverTableIdentifier = internalCatalog.dropTable(database, table);
+    disposeTable(serverTableIdentifier);
   }
 
   @VisibleForTesting
@@ -343,8 +354,8 @@ public class DefaultTableService extends PersistentBase implements TableService 
         externalCatalog.name());
     Map<TableIdentity, ServerTableIdentifier> serverTableIdentifiers =
         getAs(
-                TableMetaMapper.class,
-                mapper -> mapper.selectTableIdentifiersByCatalog(externalCatalog.name()))
+            TableMetaMapper.class,
+            mapper -> mapper.selectTableIdentifiersByCatalog(externalCatalog.name()))
             .stream()
             .collect(Collectors.toMap(TableIdentity::new, tableIdentifier -> tableIdentifier));
     LOG.info(
@@ -412,7 +423,7 @@ public class DefaultTableService extends PersistentBase implements TableService 
                     i,
                     internalCatalog.name()))
         .peek(i -> addedCount.incrementAndGet())
-        .forEach(i -> triggerTableAdded(internalCatalog, i));
+        .forEach(this::triggerTableAdded);
 
     Set<Long> tableIds =
         identifiers.stream().map(ServerTableIdentifier::getId).collect(Collectors.toSet());
@@ -437,7 +448,7 @@ public class DefaultTableService extends PersistentBase implements TableService 
         tablesToBeDisposed.size());
   }
 
-  private void checkStarted() {
+  protected void checkStarted() {
     try {
       initialized.get();
     } catch (Exception e) {
@@ -445,7 +456,7 @@ public class DefaultTableService extends PersistentBase implements TableService 
     }
   }
 
-  private void checkNotStarted() {
+  protected void checkNotStarted() {
     if (initialized.isDone()) {
       throw new IllegalStateException("Table service has started.");
     }
@@ -464,21 +475,23 @@ public class DefaultTableService extends PersistentBase implements TableService 
             ServerTableIdentifier tableIdentifier =
                 externalCatalog.getServerTableIdentifier(
                     tableIdentity.getDatabase(), tableIdentity.getTableName());
-            tableRuntimeAdded.set(triggerTableAdded(externalCatalog, tableIdentifier));
+            tableRuntimeAdded.set(triggerTableAdded(tableIdentifier));
           });
     } catch (Throwable t) {
       if (tableRuntimeAdded.get()) {
-        revertTableRuntimeAdded(externalCatalog, tableIdentity);
+        ServerTableIdentifier tableIdentifier =
+            externalCatalog.getServerTableIdentifier(
+                tableIdentity.getDatabase(), tableIdentity.getTableName());
+        if (tableIdentifier != null) {
+          tableRuntimeMap.remove(tableIdentifier.getId());
+        }
       }
       throw t;
     }
   }
 
-  private boolean triggerTableAdded(
-      ServerCatalog catalog, ServerTableIdentifier serverTableIdentifier) {
-    AmoroTable<?> table =
-        catalog.loadTable(
-            serverTableIdentifier.getDatabase(), serverTableIdentifier.getTableName());
+  protected boolean triggerTableAdded(ServerTableIdentifier serverTableIdentifier) {
+    AmoroTable<?> table = loadTable(serverTableIdentifier);
     if (TableFormat.ICEBERG.equals(table.format())) {
       if (TablePropertyUtil.isMixedTableStore(table.properties())) {
         return false;
@@ -497,48 +510,15 @@ public class DefaultTableService extends PersistentBase implements TableService 
 
     Optional<TableRuntime> tableRuntimeOpt =
         createTableRuntime(serverTableIdentifier, meta, Collections.emptyList());
-    if (!tableRuntimeOpt.isPresent()) {
+    if (tableRuntimeOpt.isPresent()) {
+      TableRuntime tableRuntime = tableRuntimeOpt.get();
+      tableRuntimeMap.put(serverTableIdentifier.getId(), tableRuntime);
+      tableRuntime.registerMetric(MetricManager.getInstance().getGlobalRegistry());
+      tableRuntimePlugins.forEach(plugin -> plugin.onTableCreated(table, tableRuntime));
+      return true;
+    } else {
       LOG.warn("No available table runtime factory found for table {}", serverTableIdentifier);
       return false;
-    }
-
-    TableRuntime tableRuntime = tableRuntimeOpt.get();
-    tableRuntimeMap.put(serverTableIdentifier.getId(), tableRuntime);
-    tableRuntime.registerMetric(MetricManager.getInstance().getGlobalRegistry());
-    if (headHandler != null) {
-      headHandler.fireTableAdded(table, tableRuntime);
-    }
-    return true;
-  }
-
-  private Optional<TableRuntime> createTableRuntime(
-      ServerTableIdentifier identifier,
-      TableRuntimeMeta runtimeMeta,
-      List<TableRuntimeState> restoredStates) {
-    return tableRuntimeFactoryManager.installedPlugins().stream()
-        .map(f -> f.accept(identifier, runtimeMeta.getTableConfig()))
-        .filter(Optional::isPresent)
-        .map(Optional::get)
-        .findFirst()
-        .map(
-            creator -> {
-              DefaultTableRuntimeStore store =
-                  new DefaultTableRuntimeStore(
-                      identifier, runtimeMeta, creator.requiredStateKeys(), restoredStates);
-              store.setRuntimeHandler(this);
-              TableRuntime tableRuntime = creator.create(store);
-              store.setTableRuntime(tableRuntime);
-              return tableRuntime;
-            });
-  }
-
-  private void revertTableRuntimeAdded(
-      ExternalCatalog externalCatalog, TableIdentity tableIdentity) {
-    ServerTableIdentifier tableIdentifier =
-        externalCatalog.getServerTableIdentifier(
-            tableIdentity.getDatabase(), tableIdentity.getTableName());
-    if (tableIdentifier != null) {
-      tableRuntimeMap.remove(tableIdentifier.getId());
     }
   }
 
@@ -552,9 +532,7 @@ public class DefaultTableService extends PersistentBase implements TableService 
                   .ifPresent(
                       tableRuntime -> {
                         try {
-                          if (headHandler != null) {
-                            headHandler.fireTableRemoved(tableRuntime);
-                          }
+                          tableRuntimePlugins.forEach(plugin -> plugin.onTableDropped(tableRuntime));
                           tableRuntime.dispose();
                           tableRuntimeMap.remove(
                               tableIdentifier.getId()); // remove only after successful operation
@@ -594,12 +572,6 @@ public class DefaultTableService extends PersistentBase implements TableService 
       this.database = serverTableIdentifier.getDatabase();
       this.tableName = serverTableIdentifier.getTableName();
       this.format = serverTableIdentifier.getFormat();
-    }
-
-    protected TableIdentity(String database, String tableName, TableFormat format) {
-      this.database = database;
-      this.tableName = tableName;
-      this.format = format;
     }
 
     public String getDatabase() {
