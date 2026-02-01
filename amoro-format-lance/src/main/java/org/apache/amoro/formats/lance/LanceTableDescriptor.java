@@ -18,7 +18,6 @@
 
 package org.apache.amoro.formats.lance;
 
-import java.util.Optional;
 import org.apache.amoro.AmoroTable;
 import org.apache.amoro.TableFormat;
 import org.apache.amoro.process.ProcessStatus;
@@ -61,6 +60,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -355,12 +355,13 @@ public class LanceTableDescriptor implements FormatTableDescriptor {
     summary.put("total-fragments", String.valueOf(manifestSummary.getTotalFragments()));
     snapshot.setSummary(summary);
 
-    transaction.ifPresent(tx -> {
-      snapshot.setOperation(tx.operation().name());
-      summary.put("transaction-uuid", tx.uuid());
-      summary.put("read-version", String.valueOf(tx.readVersion()));
-      tx.transactionProperties().ifPresent(summary::putAll);
-    });
+    transaction.ifPresent(
+        tx -> {
+          snapshot.setOperation(tx.operation().name());
+          summary.put("transaction-uuid", tx.uuid());
+          summary.put("read-version", String.valueOf(tx.readVersion()));
+          tx.transactionProperties().ifPresent(summary::putAll);
+        });
 
     Map<String, String> filesSummary = new HashMap<>();
     filesSummary.put("data-files", String.valueOf(manifestSummary.getTotalDataFiles()));

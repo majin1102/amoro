@@ -259,8 +259,8 @@ public class AmoroServiceContainer {
   }
 
   private void addHandlerChain(RuntimeHandlerChain chain) {
-    if (chain != null) {
-      tableService.addHandlerChain(chain);
+    if (chain != null && tableService instanceof DefaultTableService) {
+      ((DefaultTableService) tableService).addHandlerChain(chain);
     }
   }
 

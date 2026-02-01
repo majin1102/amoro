@@ -32,7 +32,8 @@ public interface TableRuntimeFactory extends ActivePlugin {
   Optional<Creator> accept(
       ServerTableIdentifier tableIdentifier, Map<String, String> tableProperties);
 
-  Optional<TableRuntime> create(ServerTableIdentifier tableIdentifier, Map<String, String> properties);
+  Optional<TableRuntime> create(
+      ServerTableIdentifier tableIdentifier, Map<String, String> properties);
 
   interface Creator {
     List<StateKey<?>> requiredStateKeys();

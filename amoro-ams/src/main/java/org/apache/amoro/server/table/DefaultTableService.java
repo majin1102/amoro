@@ -91,9 +91,17 @@ public class DefaultTableService extends PersistentBase implements TableService 
   private final Configurations serverConfiguration;
   private final CatalogManager catalogManager;
   private final List<TableRuntimePlugin> tableRuntimePlugins;
+  private final List<RuntimeHandlerChain> runtimeHandlerChains = new ArrayList<>();
   private ExecutorService tableExplorerExecutors;
 
-  private DefaultTableService(
+  public DefaultTableService(
+      Configurations configuration,
+      CatalogManager catalogManager,
+      TableRuntimeFactoryManager tableRuntimeFactoryManager) {
+    this(configuration, catalogManager, tableRuntimeFactoryManager, new ArrayList<>());
+  }
+
+  public DefaultTableService(
       Configurations configuration,
       CatalogManager catalogManager,
       TableRuntimeFactoryManager tableRuntimeFactoryManager,
@@ -103,7 +111,8 @@ public class DefaultTableService extends PersistentBase implements TableService 
         configuration.get(AmoroManagementConf.REFRESH_EXTERNAL_CATALOGS_INTERVAL).toMillis();
     this.serverConfiguration = configuration;
     this.tableRuntimeFactoryManager = tableRuntimeFactoryManager;
-    this.tableRuntimePlugins = tableRuntimePlugins;
+    this.tableRuntimePlugins =
+        tableRuntimePlugins == null ? new ArrayList<>() : tableRuntimePlugins;
   }
 
   @Override
@@ -112,6 +121,13 @@ public class DefaultTableService extends PersistentBase implements TableService 
     initTableRuntimes();
     initTableRuntimePlugins();
     initTableExplorer();
+  }
+
+  public void addHandlerChain(RuntimeHandlerChain chain) {
+    checkNotStarted();
+    if (chain != null) {
+      runtimeHandlerChains.add(chain);
+    }
   }
 
   private void initTableRuntimes() {
@@ -149,6 +165,11 @@ public class DefaultTableService extends PersistentBase implements TableService 
   }
 
   private void initTableRuntimePlugins() {
+    if (tableRuntimePlugins.isEmpty() && !runtimeHandlerChains.isEmpty()) {
+      IcebergTablePlugin.IcebergTablePluginBuilder builder = IcebergTablePlugin.builder();
+      runtimeHandlerChains.forEach(builder::addHandler);
+      tableRuntimePlugins.add(builder.build());
+    }
     List<TableRuntime> tableRuntimes = new ArrayList<>(tableRuntimeMap.values());
     tableRuntimePlugins.forEach(plugin -> plugin.initialize(tableRuntimes));
   }
