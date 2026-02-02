@@ -90,44 +90,28 @@ public class DefaultTableService extends PersistentBase implements TableService 
   private final CompletableFuture<Boolean> initialized = new CompletableFuture<>();
   private final Configurations serverConfiguration;
   private final CatalogManager catalogManager;
-  private final List<TableRuntimePlugin> tableRuntimePlugins;
-  private final List<RuntimeHandlerChain> runtimeHandlerChains = new ArrayList<>();
+  private List<TableRuntimePlugin> tableRuntimePlugins;
   private ExecutorService tableExplorerExecutors;
 
   public DefaultTableService(
       Configurations configuration,
       CatalogManager catalogManager,
       TableRuntimeFactoryManager tableRuntimeFactoryManager) {
-    this(configuration, catalogManager, tableRuntimeFactoryManager, new ArrayList<>());
-  }
-
-  public DefaultTableService(
-      Configurations configuration,
-      CatalogManager catalogManager,
-      TableRuntimeFactoryManager tableRuntimeFactoryManager,
-      List<TableRuntimePlugin> tableRuntimePlugins) {
     this.catalogManager = catalogManager;
     this.externalCatalogRefreshingInterval =
         configuration.get(AmoroManagementConf.REFRESH_EXTERNAL_CATALOGS_INTERVAL).toMillis();
     this.serverConfiguration = configuration;
     this.tableRuntimeFactoryManager = tableRuntimeFactoryManager;
-    this.tableRuntimePlugins =
-        tableRuntimePlugins == null ? new ArrayList<>() : tableRuntimePlugins;
   }
 
   @Override
-  public void initialize() {
+  public void initialize(List<TableRuntimePlugin> tableRuntimePlugins) {
+    this.tableRuntimePlugins =
+        tableRuntimePlugins == null ? new ArrayList<>() : tableRuntimePlugins;
     checkNotStarted();
     initTableRuntimes();
     initTableRuntimePlugins();
     initTableExplorer();
-  }
-
-  public void addHandlerChain(RuntimeHandlerChain chain) {
-    checkNotStarted();
-    if (chain != null) {
-      runtimeHandlerChains.add(chain);
-    }
   }
 
   private void initTableRuntimes() {
@@ -165,11 +149,6 @@ public class DefaultTableService extends PersistentBase implements TableService 
   }
 
   private void initTableRuntimePlugins() {
-    if (tableRuntimePlugins.isEmpty() && !runtimeHandlerChains.isEmpty()) {
-      IcebergTablePlugin.IcebergTablePluginBuilder builder = IcebergTablePlugin.builder();
-      runtimeHandlerChains.forEach(builder::addHandler);
-      tableRuntimePlugins.add(builder.build());
-    }
     List<TableRuntime> tableRuntimes = new ArrayList<>(tableRuntimeMap.values());
     tableRuntimePlugins.forEach(plugin -> plugin.initialize(tableRuntimes));
   }

@@ -18,15 +18,15 @@
 
 package org.apache.amoro.server.table;
 
+import java.util.List;
 import org.apache.amoro.AmoroTable;
 import org.apache.amoro.ServerTableIdentifier;
 import org.apache.amoro.TableRuntime;
 import org.apache.amoro.api.TableIdentifier;
-import org.apache.amoro.server.catalog.InternalCatalog;
 
 public interface TableService {
 
-  void initialize();
+  void initialize(List<TableRuntimePlugin> tableRuntimePlugins);
 
   void dispose();
 
