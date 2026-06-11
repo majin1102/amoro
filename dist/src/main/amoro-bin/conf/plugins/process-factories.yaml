@@ -1,0 +1,34 @@
+#
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+process-factories:
+  - name: iceberg
+    enabled: true
+    priority: 100
+    properties:
+      expire-snapshots.enabled: "true"
+      expire-snapshots.interval: "1h"
+      clean-orphan-files.enabled: "true"
+      clean-orphan-files.interval: "1d"
+      clean-dangling-delete-files.enabled: "true"
+      clean-dangling-delete-files.interval: "1d"
+      expire-data.enabled: "true"
+      expire-data.interval: "1d"
+      auto-create-tags.enabled: "true"
+      auto-create-tags.interval: "1min"
+      sync-hive-tables.enabled: "false"
+      sync-hive-tables.interval: "10min"

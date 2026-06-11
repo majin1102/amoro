@@ -76,6 +76,10 @@ public class TableProperties {
 
   public static final boolean ENABLE_SELF_OPTIMIZING_DEFAULT = true;
 
+  public static final String TABLE_SUMMARY_ENABLED = "table-summary.enabled";
+
+  public static final boolean TABLE_SUMMARY_ENABLED_DEFAULT = false;
+
   public static final String SELF_OPTIMIZING_ALLOW_PARTIAL_COMMIT =
       "self-optimizing.allow-partial-commit";
   public static final boolean SELF_OPTIMIZING_ALLOW_PARTIAL_COMMIT_DEFAULT = false;
@@ -159,6 +163,27 @@ public class TableProperties {
 
   public static final String SNAPSHOT_MIN_COUNT = "snapshot.keep.min-count";
   public static final int SNAPSHOT_MIN_COUNT_DEFAULT = 1;
+
+  public static final String SELF_OPTIMIZING_REFRESH_TABLE_ADAPTIVE_MAX_INTERVAL_MS =
+      "self-optimizing.refresh-table.adaptive.max-interval-ms";
+  public static final long SELF_OPTIMIZING_REFRESH_TABLE_ADAPTIVE_MAX_INTERVAL_MS_DEFAULT =
+      0; // disabled
+  public static final String SELF_OPTIMIZING_REFRESH_TABLE_ADAPTIVE_INCREASE_STEP_MS =
+      "self-optimizing.refresh-table.adaptive.increase-step-ms";
+  public static final long SELF_OPTIMIZING_REFRESH_TABLE_ADAPTIVE_INCREASE_STEP_MS_DEFAULT =
+      30000; // 30s
+
+  public static final String SELF_OPTIMIZING_REWRITE_USE_PARQUET_ROW_GROUP_MERGE_ENABLED =
+      "self-optimizing.rewrite.use-parquet-row-group-merge.enabled";
+  public static final boolean SELF_OPTIMIZING_REWRITE_USE_PARQUET_ROW_GROUP_MERGE_ENABLED_DEFAULT =
+      false;
+
+  public static final String
+      SELF_OPTIMIZING_REWRITE_USE_PARQUET_ROW_GROUP_MERGE_MIN_AVG_ROW_GROUP_SIZE_BYTES =
+          "self-optimizing.rewrite.use-parquet-row-group-merge.min-avg-row-group-size-bytes";
+  public static final long
+      SELF_OPTIMIZING_REWRITE_USE_PARQUET_ROW_GROUP_MERGE_MIN_AVG_ROW_GROUP_SIZE_DEFAULT =
+          8388608; // 8 MB
 
   /**
    * The retention period for snapshots created by Flink checkpoints. Snapshots older than this

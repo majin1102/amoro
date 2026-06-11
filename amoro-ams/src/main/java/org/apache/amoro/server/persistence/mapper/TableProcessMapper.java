@@ -42,6 +42,13 @@ public interface TableProcessMapper {
   @Delete("DELETE FROM table_process WHERE process_id <= #{processId} AND table_id = #{tableId}")
   void deleteBefore(@Param("tableId") long tableId, @Param("processId") long processId);
 
+  @Delete(
+      "DELETE FROM table_process WHERE process_id <= #{minProcessId} "
+          + "AND table_id = #{tableId} "
+          + "AND status NOT IN ('SUBMITTED', 'RUNNING', 'PENDING', 'CANCELING')")
+  void deleteExpiredProcesses(
+      @Param("tableId") long tableId, @Param("minProcessId") long minProcessId);
+
   @Insert(
       "INSERT INTO table_process "
           + "(process_id, table_id, external_process_identifier, status, process_type, process_stage, execution_engine, retry_number, "
@@ -124,6 +131,7 @@ public interface TableProcessMapper {
           + "create_time, finish_time, fail_message, process_parameters, summary "
           + "FROM table_process WHERE table_id = #{tableId} "
           + " <if test='processType != null'> AND process_type = #{processType}</if>"
+          + " <if test='processType == null and includeTypes != null and includeTypes.size() > 0'> AND process_type IN <foreach collection='includeTypes' item='type' open='(' separator=',' close=')'>#{type}</foreach></if>"
           + " <if test='status != null'> AND status = #{status}</if>"
           + " ORDER BY process_id desc"
           + "</script>")
@@ -131,6 +139,7 @@ public interface TableProcessMapper {
   List<TableProcessMeta> listProcessMeta(
       @Param("tableId") long tableId,
       @Param("processType") String processType,
+      @Param("includeTypes") List<String> includeTypes,
       @Param("status") ProcessStatus optimizingStatus);
 
   @Select(

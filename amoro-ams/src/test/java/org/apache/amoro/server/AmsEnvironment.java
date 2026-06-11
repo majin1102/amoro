@@ -121,6 +121,10 @@ public class AmsEnvironment {
         new File(rootPath + "/conf/plugins/table-runtime-factories.yaml"),
         getTableRuntimeFactoriesConfig(),
         Charset.defaultCharset());
+    FileUtils.writeStringToFile(
+        new File(rootPath + "/conf/plugins/rest-extensions.yaml"),
+        getRestExtensionsConfig(),
+        Charset.defaultCharset());
     System.setProperty(Environments.AMORO_HOME, rootPath);
     System.setProperty("derby.init.sql.dir", path + "../classes/sql/derby/");
     serviceContainer = new AmoroServiceContainer();
@@ -365,8 +369,6 @@ public class AmsEnvironment {
         + "  refresh-table-thread-count: 10\n"
         + "  refresh-table-interval: 60000 #1min\n"
         + "  expire-table-thread-count: 10\n"
-        + "  clean-orphan-file-thread-count: 10\n"
-        + "  sync-hive-tables-thread-count: 10\n"
         + "\n"
         + "  thrift-server:\n"
         + "    max-message-size: 104857600 # 100MB\n"
@@ -425,5 +427,9 @@ public class AmsEnvironment {
         + "  - name: default\n"
         + "    enabled: true\n"
         + "    priority: 100\n";
+  }
+
+  private String getRestExtensionsConfig() {
+    return "rest-extensions:\n" + "  - name: iceberg-rest-catalog\n" + "    enabled: true\n";
   }
 }

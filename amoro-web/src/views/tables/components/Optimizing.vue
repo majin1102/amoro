@@ -20,11 +20,20 @@ limitations under the License.
 import { onMounted, reactive, ref, shallowReactive } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router'
-import { Modal } from 'ant-design-vue'
+import { Modal, message } from 'ant-design-vue'
 import { usePagination } from '@/hooks/usePagination'
 import type { BreadcrumbOptimizingItem, IColumns, ILableAndValue } from '@/types/common.type'
-import { cancelOptimizingProcess, getOptimizingProcesses, getTableOptimizingTypes, getTasksByOptimizingProcessId } from '@/services/table.service'
+import { cancelOptimizingProcess, getOptimizingProcesses, getTableProcessTypes, getTasksByOptimizingProcessId } from '@/services/table.service'
 import { bytesToSize, dateFormat, formatMS2Time } from '@/utils/index'
+import { canManageTable } from '@/utils/permission'
+
+const props = withDefaults(defineProps<{
+  processCategory?: string
+  cancelModalTitleKey?: string
+}>(), {
+  processCategory: 'OPTIMIZING',
+  cancelModalTitleKey: 'cancelOptimizingProcessOptModalTitle',
+})
 
 const hasBreadcrumb = ref<boolean>(false)
 
@@ -77,6 +86,7 @@ const breadcrumbDataSource = reactive<BreadcrumbOptimizingItem[]>([])
 
 const loading = ref<boolean>(false)
 const cancelDisabled = ref(true)
+const writable = ref<boolean>(canManageTable())
 const pagination = reactive(usePagination())
 const breadcrumbPagination = reactive(usePagination())
 const route = useRoute()
@@ -93,12 +103,18 @@ const statusType = ref<ILableAndValue>()
 const statusTypeList = ref<ILableAndValue[]>([])
 
 async function getQueryDataDictList() {
-  const tableProcessTypes = await getTableOptimizingTypes({ ...sourceData })
-  const typesList = Object.entries(tableProcessTypes).map(([typeName, displayName]) => ({ label: displayName as string, value: typeName }))
   const status = Object.entries(statusMap).map(([key, value]) => ({ label: value.title, value: key }))
-
-  actionTypeList.value = typesList
   statusTypeList.value = status
+
+  try {
+    const rawTypes = await getTableProcessTypes({ ...sourceData, processCategory: props.processCategory })
+    actionTypeList.value = Object.entries(rawTypes).map(([typeName, displayName]) => ({ label: displayName as string, value: typeName }))
+  }
+  catch (error) {
+    console.error('Failed to load process types:', error)
+    message.error(t('loadProcessTypesFailed'))
+    actionTypeList.value = []
+  }
 }
 
 async function refreshOptimizingProcesses() {
@@ -107,14 +123,15 @@ async function refreshOptimizingProcesses() {
     dataSource.length = 0
     const result = await getOptimizingProcesses({
       ...sourceData,
-      type: actionType.value || '',
-      status: statusType.value || '',
+      type: String(actionType.value || ''),
+      processCategory: props.processCategory,
+      status: String(statusType.value || ''),
       page: pagination.current,
       pageSize: pagination.pageSize,
-    } as any)
+    })
     const { list, total = 0 } = result
     pagination.total = total
-    dataSource.push(...[...list || []].map((item) => {
+    dataSource.push(...[...list || []].map((item: any) => {
       const { inputFiles = {}, outputFiles = {} } = item
       return {
         ...item,
@@ -140,7 +157,7 @@ async function refreshOptimizingProcesses() {
 
 async function cancel() {
   Modal.confirm({
-    title: t('cancelOptimizingProcessOptModalTitle'),
+    title: t(props.cancelModalTitleKey),
     onOk: async () => {
       try {
         loading.value = true
@@ -240,11 +257,11 @@ onMounted(() => {
     <template v-if="!hasBreadcrumb">
       <a-space class="filter-form">
         <a-select
-          v-model:value="actionType" allow-clear placeholder="Type" :options="actionTypeList"
+          v-model:value="actionType" allow-clear :placeholder="t('type')" :options="actionTypeList"
           style="min-width: 150px;" @change="refresh"
         />
         <a-select
-          v-model:value="statusType" allow-clear placeholder="Status" :options="statusTypeList"
+          v-model:value="statusType" allow-clear :placeholder="t('status')" :options="statusTypeList"
           style="min-width: 150px;" @change="refresh"
         />
       </a-space>
@@ -258,7 +275,7 @@ onMounted(() => {
               {{ column.title }}
             </div>
             <div class="">
-              success / total
+              {{ t('successSlashTotal') }}
             </div>
           </template>
           <template v-if="column.dataIndex === 'inputFiles'">
@@ -266,7 +283,7 @@ onMounted(() => {
               {{ column.title }}
             </div>
             <div class="">
-              size / count
+              {{ t('sizeSlashCount') }}
             </div>
           </template>
           <template v-if="column.dataIndex === 'outputFiles'">
@@ -274,7 +291,7 @@ onMounted(() => {
               {{ column.title }}
             </div>
             <div class="">
-              size / count
+              {{ t('sizeSlashCount') }}
             </div>
           </template>
         </template>
@@ -322,13 +339,13 @@ onMounted(() => {
         <a-col :span="18">
           <a-breadcrumb separator=">">
             <a-breadcrumb-item class="text-active" @click="toggleBreadcrumb">
-              All
+              {{ t('all') }}
             </a-breadcrumb-item>
             <a-breadcrumb-item>{{ `${$t('processId')} ${processId}` }}</a-breadcrumb-item>
           </a-breadcrumb>
         </a-col>
         <a-col :span="6">
-          <a-button
+          <a-button v-if="writable"
             v-model:disabled="cancelDisabled" type="primary" class="g-mb-16" style="float: right"
             @click="cancel"
           >
@@ -346,7 +363,7 @@ onMounted(() => {
               {{ column.title }}
             </div>
             <div class="">
-              size / count
+              {{ t('sizeSlashCount') }}
             </div>
           </template>
           <template v-if="column.dataIndex === 'outputFilesDesc'">
@@ -354,7 +371,7 @@ onMounted(() => {
               {{ column.title }}
             </div>
             <div class="">
-              size / count
+              {{ t('sizeSlashCount') }}
             </div>
           </template>
         </template>
@@ -413,10 +430,6 @@ onMounted(() => {
 
   :deep(.ant-table-thead > tr:not(:last-child) > th[colspan]) {
     border-bottom: 1px solid #e8e8f0;
-  }
-
-  :deep(.ant-table-thead > tr > th) {
-    padding: 4px 16px !important;
   }
 
   :deep(.ant-table-thead > tr > th) {

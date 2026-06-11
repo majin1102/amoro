@@ -29,6 +29,9 @@ public class OptimizingConfig {
   // self-optimizing.enabled
   private boolean enabled;
 
+  // table-summary.enabled
+  private boolean tableSummaryEnabled;
+
   private boolean allowPartialCommit;
 
   // self-optimizing.quota
@@ -97,6 +100,12 @@ public class OptimizingConfig {
   // self-optimizing.evaluation.fallback-interval
   private long evaluationFallbackInterval;
 
+  // self-optimizing.refresh-table.adaptive.max-interval-ms
+  private long refreshTableAdaptiveMaxIntervalMs;
+
+  // self-optimizing.refresh-table.adaptive.increase-step-ms
+  private long refreshTableAdaptiveIncreaseStepMs;
+
   public OptimizingConfig() {}
 
   public boolean isEnabled() {
@@ -105,6 +114,15 @@ public class OptimizingConfig {
 
   public OptimizingConfig setEnabled(boolean enabled) {
     this.enabled = enabled;
+    return this;
+  }
+
+  public boolean isTableSummaryEnabled() {
+    return tableSummaryEnabled;
+  }
+
+  public OptimizingConfig setTableSummaryEnabled(boolean tableSummaryEnabled) {
+    this.tableSummaryEnabled = tableSummaryEnabled;
     return this;
   }
 
@@ -318,6 +336,36 @@ public class OptimizingConfig {
     return this;
   }
 
+  /**
+   * Adaptive refresh is enabled only when max interval is valid and greater than min interval.
+   *
+   * @param minInterval the minimum interval
+   * @return true if the adaptive refresh is enabled
+   */
+  public boolean isRefreshTableAdaptiveEnabled(long minInterval) {
+    return refreshTableAdaptiveMaxIntervalMs > 0 && refreshTableAdaptiveMaxIntervalMs > minInterval;
+  }
+
+  public long getRefreshTableAdaptiveMaxIntervalMs() {
+    return refreshTableAdaptiveMaxIntervalMs;
+  }
+
+  public OptimizingConfig setRefreshTableAdaptiveMaxIntervalMs(
+      long refreshTableAdaptiveMaxIntervalMs) {
+    this.refreshTableAdaptiveMaxIntervalMs = refreshTableAdaptiveMaxIntervalMs;
+    return this;
+  }
+
+  public long getRefreshTableAdaptiveIncreaseStepMs() {
+    return refreshTableAdaptiveIncreaseStepMs;
+  }
+
+  public OptimizingConfig setRefreshTableAdaptiveIncreaseStepMs(
+      long refreshTableAdaptiveIncreaseStepMs) {
+    this.refreshTableAdaptiveIncreaseStepMs = refreshTableAdaptiveIncreaseStepMs;
+    return this;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -328,6 +376,7 @@ public class OptimizingConfig {
     }
     OptimizingConfig that = (OptimizingConfig) o;
     return enabled == that.enabled
+        && tableSummaryEnabled == that.tableSummaryEnabled
         && allowPartialCommit == that.allowPartialCommit
         && Double.compare(that.targetQuota, targetQuota) == 0
         && maxExecuteRetryCount == that.maxExecuteRetryCount
@@ -350,13 +399,17 @@ public class OptimizingConfig {
         && Objects.equal(optimizerGroup, that.optimizerGroup)
         && Objects.equal(minPlanInterval, that.minPlanInterval)
         && Objects.equal(evaluationMseTolerance, that.evaluationMseTolerance)
-        && Objects.equal(evaluationFallbackInterval, that.evaluationFallbackInterval);
+        && Objects.equal(evaluationFallbackInterval, that.evaluationFallbackInterval)
+        && Objects.equal(refreshTableAdaptiveMaxIntervalMs, that.refreshTableAdaptiveMaxIntervalMs)
+        && Objects.equal(
+            refreshTableAdaptiveIncreaseStepMs, that.refreshTableAdaptiveIncreaseStepMs);
   }
 
   @Override
   public int hashCode() {
     return Objects.hashCode(
         enabled,
+        tableSummaryEnabled,
         allowPartialCommit,
         targetQuota,
         optimizerGroup,
@@ -379,13 +432,16 @@ public class OptimizingConfig {
         hiveRefreshInterval,
         minPlanInterval,
         evaluationMseTolerance,
-        evaluationFallbackInterval);
+        evaluationFallbackInterval,
+        refreshTableAdaptiveMaxIntervalMs,
+        refreshTableAdaptiveIncreaseStepMs);
   }
 
   @Override
   public String toString() {
     return MoreObjects.toStringHelper(this)
         .add("enabled", enabled)
+        .add("tableSummaryEnabled", tableSummaryEnabled)
         .add("commitOnPartialSuccess", allowPartialCommit)
         .add("targetQuota", targetQuota)
         .add("optimizerGroup", optimizerGroup)
@@ -407,6 +463,8 @@ public class OptimizingConfig {
         .add("hiveRefreshInterval", hiveRefreshInterval)
         .add("evaluationMseTolerance", evaluationMseTolerance)
         .add("evaluationFallbackInterval", evaluationFallbackInterval)
+        .add("refreshTableAdaptiveMaxIntervalMs", refreshTableAdaptiveMaxIntervalMs)
+        .add("refreshTableAdaptiveIncreaseStepMs", refreshTableAdaptiveIncreaseStepMs)
         .toString();
   }
 }

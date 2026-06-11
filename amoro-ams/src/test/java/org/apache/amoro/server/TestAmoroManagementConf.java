@@ -45,7 +45,6 @@ public class TestAmoroManagementConf {
   private static final ConfigOption<Duration>[] TIME_RELATED_CONFIG_OPTIONS =
       new ConfigOption[] {
         AmoroManagementConf.REFRESH_EXTERNAL_CATALOGS_INTERVAL,
-        AmoroManagementConf.AUTO_CREATE_TAGS_INTERVAL,
         AmoroManagementConf.REFRESH_TABLES_INTERVAL,
         AmoroManagementConf.BLOCKER_TIMEOUT,
         AmoroManagementConf.OPTIMIZER_HB_TIMEOUT,
@@ -57,7 +56,6 @@ public class TestAmoroManagementConf {
   private static final Map<String, String> DEFAULT_TIME_UNIT_IN_OLD_VERSIONS =
       ImmutableMap.<String, String>builder()
           .put(AmoroManagementConf.REFRESH_EXTERNAL_CATALOGS_INTERVAL.key(), "ms")
-          .put(AmoroManagementConf.AUTO_CREATE_TAGS_INTERVAL.key(), "ms")
           .put(AmoroManagementConf.REFRESH_TABLES_INTERVAL.key(), "ms")
           .put(AmoroManagementConf.BLOCKER_TIMEOUT.key(), "ms")
           .put(AmoroManagementConf.OPTIMIZER_HB_TIMEOUT.key(), "ms")
@@ -75,6 +73,32 @@ public class TestAmoroManagementConf {
     Configurations expectedConfig =
         Configurations.fromObjectMap(timeRelatedConfigMapInMillisSecondsWithoutTimeUnits);
     assertTimeRelatedConfigs(serviceConfig, expectedConfig);
+  }
+
+  @Test
+  void testNewDurationConfigDefaults() {
+    Configurations serviceConfig = new Configurations();
+    Assertions.assertEquals(
+        Duration.ofDays(30),
+        serviceConfig.get(AmoroManagementConf.OPTIMIZING_RUNTIME_DATA_KEEP_TIME));
+    Assertions.assertEquals(
+        Duration.ofHours(1),
+        serviceConfig.get(AmoroManagementConf.OPTIMIZING_RUNTIME_DATA_EXPIRE_INTERVAL));
+    Assertions.assertEquals(
+        Duration.ofDays(7), serviceConfig.get(AmoroManagementConf.PROCESS_HISTORY_DATA_KEEP_TIME));
+  }
+
+  @Test
+  void testDeprecatedIntegerConfigDefaults() {
+    Configurations serviceConfig = new Configurations();
+    Assertions.assertEquals(
+        30, serviceConfig.getInteger(AmoroManagementConf.OPTIMIZING_RUNTIME_DATA_KEEP_DAYS));
+    Assertions.assertEquals(
+        1,
+        serviceConfig.getInteger(
+            AmoroManagementConf.OPTIMIZING_RUNTIME_DATA_EXPIRE_INTERVAL_HOURS));
+    Assertions.assertEquals(
+        7, serviceConfig.getInteger(AmoroManagementConf.PROCESS_HISTORY_DATA_KEEP_DAYS));
   }
 
   @Test
@@ -202,7 +226,6 @@ public class TestAmoroManagementConf {
           .put("optimizer.task-ack-timeout", "30000")
           .put("optimizer.polling-timeout", "3000")
           .put("blocker.timeout", "60000")
-          .put("auto-create-tags.interval", "60000")
           .put("terminal.session.timeout", "1800000")
           .build();
 
@@ -214,7 +237,6 @@ public class TestAmoroManagementConf {
           .put("optimizer.task-ack-timeout", "60 s")
           .put("optimizer.polling-timeout", "6 s")
           .put("blocker.timeout", "2 min")
-          .put("auto-create-tags.interval", "2 min")
           .put("terminal.session.timeout", "30 ms")
           .build();
 
@@ -226,7 +248,6 @@ public class TestAmoroManagementConf {
           .put("optimizer.task-ack-timeout", "60 s")
           .put("optimizer.polling-timeout", "6 s")
           .put("blocker.timeout", "2 min")
-          .put("auto-create-tags.interval", "2 min")
           .put("terminal.session.timeout", "30 min")
           .build();
 

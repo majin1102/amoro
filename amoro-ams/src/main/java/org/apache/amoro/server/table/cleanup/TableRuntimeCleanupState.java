@@ -28,31 +28,36 @@ public class TableRuntimeCleanupState {
     return lastOrphanFilesCleanTime;
   }
 
-  public void setLastOrphanFilesCleanTime(long lastOrphanFilesCleanTime) {
+  public TableRuntimeCleanupState setLastOrphanFilesCleanTime(long lastOrphanFilesCleanTime) {
     this.lastOrphanFilesCleanTime = lastOrphanFilesCleanTime;
+    return this;
   }
 
   public long getLastDanglingDeleteFilesCleanTime() {
     return lastDanglingDeleteFilesCleanTime;
   }
 
-  public void setLastDanglingDeleteFilesCleanTime(long lastDanglingDeleteFilesCleanTime) {
+  public TableRuntimeCleanupState setLastDanglingDeleteFilesCleanTime(
+      long lastDanglingDeleteFilesCleanTime) {
     this.lastDanglingDeleteFilesCleanTime = lastDanglingDeleteFilesCleanTime;
+    return this;
   }
 
   public long getLastDataExpiringTime() {
     return lastDataExpiringTime;
   }
 
-  public void setLastDataExpiringTime(long lastDataExpiringTime) {
+  public TableRuntimeCleanupState setLastDataExpiringTime(long lastDataExpiringTime) {
     this.lastDataExpiringTime = lastDataExpiringTime;
+    return this;
   }
 
   public long getLastSnapshotsExpiringTime() {
     return lastSnapshotsExpiringTime;
   }
 
-  public void setLastSnapshotsExpiringTime(long lastSnapshotsExpiringTime) {
+  public TableRuntimeCleanupState setLastSnapshotsExpiringTime(long lastSnapshotsExpiringTime) {
     this.lastSnapshotsExpiringTime = lastSnapshotsExpiringTime;
+    return this;
   }
 }
